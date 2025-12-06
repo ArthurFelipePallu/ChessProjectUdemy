@@ -10,8 +10,8 @@ public class Knight : Piece
     {
         Value = 3;
         Name = "Knight";
-        _chessNotation = 'N';
-        _pieceType = PieceType.Knight;
+        ChessNotation = 'N';
+        PieceType = PieceType.Knight;
     }
     
 }

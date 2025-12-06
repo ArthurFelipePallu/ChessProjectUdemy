@@ -6,6 +6,6 @@ public static class PieceExtensions
 {
     public static ConsoleColor GetPieceConsoleColor(this Piece piece)
     {
-        return piece.PieceColor == PieceColor.Black ? ConsoleColor.Yellow : ConsoleColor.White;
+        return piece.GetPieceColor() == PieceColor.Black ? ConsoleColor.Yellow : ConsoleColor.White;
     }
 }

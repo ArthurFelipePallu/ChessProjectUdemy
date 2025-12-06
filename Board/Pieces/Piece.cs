@@ -7,21 +7,20 @@ public abstract class Piece
     /// </summary>
     
     public int Value;
-    public PieceColor PieceColor;
     public string Name;
-    protected char _chessNotation;
+    protected char ChessNotation;
     public Position Position;
     public ChessBoard Board;
-    protected PieceType _pieceType;
+    private PieceColor _pieceColor;
+    protected PieceType PieceType;
     public int TimesMoved {get; protected set;}
 
 
 
     protected Piece(ChessBoard board, PieceColor pieceColor)
     {
-        PieceColor = pieceColor;
+        _pieceColor = pieceColor;
         Board = board;
-        Position = null;
         TimesMoved = 0;
     }
 
@@ -30,16 +29,35 @@ public abstract class Piece
         Position = position;
     }
 
+    /// <summary>
+    /// PIECE TYPE
+    /// </summary>
+    /// <returns></returns>
     public PieceType GetPieceType()
     {
-        return _pieceType;
+        return PieceType;
     }
     public string GetPieceTypeAsString()
     {
-        return _pieceType.ToString();
+        return PieceType.ToString();
     }
+    
+    /// <summary>
+    /// PIECE COLOR
+    /// </summary>
+    /// <returns></returns>
+    public PieceColor GetPieceColor()
+    {
+        return _pieceColor;
+    }
+    public string GetPieceColroAsString()
+    {
+        return _pieceColor.ToString();
+    }
+    
+    
     public override string ToString()
     {
-        return $" {_chessNotation.ToString()} ";
+        return $" {ChessNotation.ToString()} ";
     }
 }

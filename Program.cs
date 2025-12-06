@@ -16,6 +16,9 @@ var row = Console.ReadLine();
 
 var newPosition = new ChessNotationPosition( int.Parse(row),char.Parse(col));
 
-Console.WriteLine(newPosition.ToString());
-Console.WriteLine("Array position : " + newPosition.ToPosition().ToString());
+Console.WriteLine($"Position {newPosition.ToPosition()}");
+
+var piece = chessBoard.AccessPieceAtChessNotationPosition(newPosition);
+
+Console.WriteLine(piece.GetPieceColor() + " "+  piece.GetPieceTypeAsString());
 

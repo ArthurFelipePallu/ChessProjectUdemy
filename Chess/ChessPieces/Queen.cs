@@ -10,7 +10,7 @@ public class Queen : Piece
     {
         Value = 9;
         Name = "Queen";
-        _chessNotation = 'Q';
-        _pieceType = PieceType.Queen;
+        ChessNotation = 'Q';
+        PieceType = PieceType.Queen;
     }
 }

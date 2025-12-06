@@ -38,7 +38,7 @@ public static class BoardExtensions
     private static void CreateBlackPiecesInitialPosition(this ChessBoard board)
     {
         board.AddBlackPieceOfTypeAtPosition(PieceType.Rook,new Position(0,0));
-        board.AddBlackPieceOfTypeAtPosition(PieceType.Knight,new Position(0,0));
+        board.AddBlackPieceOfTypeAtPosition(PieceType.Knight,new Position(0,1));
         board.AddBlackPieceOfTypeAtPosition(PieceType.Bishop,new Position(0,2));
         board.AddBlackPieceOfTypeAtPosition(PieceType.Queen,new Position(0,3));
         board.AddBlackPieceOfTypeAtPosition(PieceType.King,new Position(0,4));

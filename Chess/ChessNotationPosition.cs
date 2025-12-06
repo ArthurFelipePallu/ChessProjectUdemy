@@ -5,8 +5,8 @@ namespace Chess_Console_Project.Board;
 public struct ChessNotationPosition
 {
     private const int MaxChessBoardSize = 8;
-    public char Col;// A - H
-    public int Row;  // 1 - 8
+    private int _row;  // 1 - 8
+    private char _col;// A - H
 
     public ChessNotationPosition(int row, char col) 
     {
@@ -18,14 +18,14 @@ public struct ChessNotationPosition
     {
         if(row is < 1 or > MaxChessBoardSize)
             throw new ChessException($"[CHESS NOTRIFICATION POSITION] Row {row} is out of range [1 - 8] ");
-        this.Row = row;
+        this._row = row;
     }
     private void ValidateColumn(char col)
     {
         col = char.ToUpper(col);
         if(col is < 'A' or > 'H')
             throw new ChessException($"[CHESS NOTRIFICATION POSITION] Column {col} is out of range [a - h] ");
-        this.Col = col;
+        this._col = col;
     }
 
     public Position ToPosition()
@@ -36,11 +36,12 @@ public struct ChessNotationPosition
         //Notação de Tabuleiro vai de 1 - 8
         //Subtraindo 1 para acessar
         //posições da matriz de 0 a 7
-        return new Position(Col - 65,Row - 1 );
+        
+        return new Position(MaxChessBoardSize -_row ,_col - 65 );
     }
 
     public override string ToString()
     {
-        return $"[CHESS NOTATION POSITION[:  [{Col}{Row}]";
+        return $"[CHESS NOTATION POSITION[:  [{_col}{_row}]";
     }
 }

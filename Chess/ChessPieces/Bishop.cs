@@ -10,7 +10,7 @@ public class Bishop : Piece
     {
         Value = 3;
         Name = "Bishop";
-        _chessNotation = 'B';
-        _pieceType = PieceType.Bishop;
+        ChessNotation = 'B';
+        PieceType = PieceType.Bishop;
     }
 }
