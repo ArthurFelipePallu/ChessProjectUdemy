@@ -68,7 +68,7 @@ public class ChessBoard
     {
         if (!HasPieceAtCoordinate(row, col))
         {
-            throw new BoardException($"[CHESS BOARD] No Piece to remove at [ {row} , s{col} ]");
+            throw new BoardException($"[CHESS BOARD] No Piece to remove at [ {row} , {col} ]");
         }
 
         var removedPiece = Board[row, col];

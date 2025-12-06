@@ -1,27 +1,21 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using Chess_Console_Project.Board;
 
-var chessBoard = new ChessBoard();
+using Chess_Console_Project.Chess.Match;
 
-chessBoard.CreateChessBoardInitialPosition();
+var match = new ChessMatch();
 
-chessBoard.PrintBoardExtension();
+bool PLAY = true;
 
-Console.WriteLine("Specify a Column [a - h] or [A - H]");
-var col =  Console.ReadLine();
+while(PLAY)
+{
+    match.UpdateMatch();
+    
+    
+    Console.WriteLine("DO YOU WISH TO CONTINUE??  [ S , N ] ");
+    var s = Console.ReadLine();
+    var ss = char.Parse(s);
+    if (char.ToLower(ss) == 'n')
+        PLAY = false;
 
-Console.WriteLine("Specify a Row [1 - 8]");
-var row = Console.ReadLine();
-
-var newPosition = new ChessNotationPosition( int.Parse(row),char.Parse(col));
-
-Console.WriteLine($"Position {newPosition.ToPosition()}");
-
-var piece = chessBoard.AccessPieceAtChessNotationPosition(newPosition);
-
-Console.WriteLine(piece.GetPieceColor() + " "+  piece.GetPieceTypeAsString());
-
-chessBoard.RemovePieceFromBoardAt(newPosition.ToPosition());
-
-chessBoard.PrintBoardExtension();
+}
