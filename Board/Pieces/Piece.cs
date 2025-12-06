@@ -1,4 +1,4 @@
-﻿namespace Chess_Console_Project.Board;
+﻿namespace Chess_Console_Project.Board.Pieces;
 
 public abstract class Piece
 {
@@ -16,12 +16,17 @@ public abstract class Piece
 
 
 
-    protected Piece(ChessBoard board, PieceColor pieceColor,Position pos)
+    protected Piece(ChessBoard board, PieceColor pieceColor)
     {
         PieceColor = pieceColor;
         Board = board;
-        Position = pos;
+        Position = null;
         TimesMoved = 0;
+    }
+
+    public void SetPiecePosition(Position position)
+    {
+        Position = position;
     }
 
     public override string ToString()

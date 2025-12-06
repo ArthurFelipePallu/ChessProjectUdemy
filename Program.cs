@@ -8,5 +8,14 @@ chessBoard.CreateChessBoardInitialPosition();
 
 chessBoard.PrintBoardExtension();
 
+Console.WriteLine("Specify a Column [a - h] or [A - H]");
+var col =  Console.ReadLine();
 
+Console.WriteLine("Specify a Row [1 - 8]");
+var row = Console.ReadLine();
+
+var newPosition = new ChessNotationPosition( int.Parse(row),char.Parse(col));
+
+Console.WriteLine(newPosition.ToString());
+Console.WriteLine("Array position : " + newPosition.ToPosition().ToString());
 
