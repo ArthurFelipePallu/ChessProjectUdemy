@@ -1,6 +1,6 @@
 ﻿namespace Chess_Console_Project.Board;
 
-public enum Color
+public enum PieceColor
 {
     Black,
     White
