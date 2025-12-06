@@ -1,4 +1,6 @@
-﻿namespace Chess_Console_Project.Board;
+﻿using Chess_Console_Project.Board.Exceptions;
+
+namespace Chess_Console_Project.Board;
 
 public static class BoardExtensions
 {
@@ -8,7 +10,7 @@ public static class BoardExtensions
         {
             for (var j = 0; j < board.MaxChessBoardSize; j++)
             {
-                var piece = board.AccessPieceAtPosition(i, j);
+                var piece = board.AccessPieceAtCoordinates(i, j);
                 Console.ForegroundColor = piece?.GetPieceConsoleColor() ?? ConsoleColor.DarkGray;
                 var toWrite = piece?.ToString() ?? " - ";
                 
@@ -22,14 +24,21 @@ public static class BoardExtensions
 
     public static void CreateChessBoardInitialPosition(this ChessBoard board)
     {
-        board.CreateBlackPiecesInitialPosition();
-        board.CreateWhitePiecesInitialPosition();
+        try
+        {
+            board.CreateBlackPiecesInitialPosition();
+            board.CreateWhitePiecesInitialPosition();
+        }
+        catch (BoardException e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 
     private static void CreateBlackPiecesInitialPosition(this ChessBoard board)
     {
         board.AddBlackPieceOfTypeAtPosition(PieceType.Rook,new Position(0,0));
-        board.AddBlackPieceOfTypeAtPosition(PieceType.Knight,new Position(0,1));
+        board.AddBlackPieceOfTypeAtPosition(PieceType.Knight,new Position(0,0));
         board.AddBlackPieceOfTypeAtPosition(PieceType.Bishop,new Position(0,2));
         board.AddBlackPieceOfTypeAtPosition(PieceType.Queen,new Position(0,3));
         board.AddBlackPieceOfTypeAtPosition(PieceType.King,new Position(0,4));

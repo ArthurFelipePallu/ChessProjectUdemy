@@ -12,6 +12,7 @@ public abstract class Piece
     protected char _chessNotation;
     public Position Position;
     public ChessBoard Board;
+    protected PieceType _pieceType;
     public int TimesMoved {get; protected set;}
 
 
@@ -29,6 +30,14 @@ public abstract class Piece
         Position = position;
     }
 
+    public PieceType GetPieceType()
+    {
+        return _pieceType;
+    }
+    public string GetPieceTypeAsString()
+    {
+        return _pieceType.ToString();
+    }
     public override string ToString()
     {
         return $" {_chessNotation.ToString()} ";
