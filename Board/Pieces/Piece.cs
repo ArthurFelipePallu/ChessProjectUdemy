@@ -1,29 +1,31 @@
 ﻿namespace Chess_Console_Project.Board;
 
-public class Piece
+public abstract class Piece
 {
     /// <summary>
     /// PRIVATE
     /// </summary>
     
     public int Value;
-    public Color Color;
+    public PieceColor PieceColor;
     public string Name;
-    public char Symbol;
+    protected char _chessNotation;
     public Position Position;
     public ChessBoard Board;
     public int TimesMoved {get; protected set;}
 
 
 
-    public Piece(ChessBoard board, int value, Color color, string name, char symbol,Position pos)
+    protected Piece(ChessBoard board, PieceColor pieceColor,Position pos)
     {
-        Name = name;
-        Symbol = symbol;
-        Value = value;
-        Color = color;
+        PieceColor = pieceColor;
         Board = board;
         Position = pos;
         TimesMoved = 0;
+    }
+
+    public override string ToString()
+    {
+        return $" {_chessNotation.ToString()} ";
     }
 }
