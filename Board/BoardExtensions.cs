@@ -67,19 +67,29 @@ public static class BoardExtensions
             board.WriteRowName(i);
             for (var j = 0; j < board.MaxChessBoardSize; j++)
             {
+                board.BoardBackGroundColor(i,j);
                 var piece = board.AccessPieceAtCoordinates(i, j);
                 Console.ForegroundColor = piece?.GetPieceConsoleColor() ?? ConsoleColor.DarkGray;
-                var toWrite = piece?.ToString() ?? " - ";
+                var toWrite = piece?.GetPieceNotation() ?? "   ";
                 
                 Console.Write(toWrite);
                 
             }
+            
+            Console.BackgroundColor = ConsoleColor.Black;
             Console.WriteLine(); // QUEBRA LINHA
         }
+
         board.WriteSeparationLine();
         board.WriteColumnNames();
     }
 
+    private static void BoardBackGroundColor(this ChessBoard board, int i, int j)
+    {
+        Console.BackgroundColor = ((i+j) %2) != 0 ? ConsoleColor.DarkGray : ConsoleColor.Gray;   
+    }
+    
+    
     private static void WriteRowName(this ChessBoard board, int row)
     {
         Console.ForegroundColor = ConsoleColor.DarkGray;
