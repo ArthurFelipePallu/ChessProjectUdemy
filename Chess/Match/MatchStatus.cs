@@ -6,5 +6,6 @@ public enum MatchStatus
     WaitingForPlayer,
     Starting,
     Playing,
+    Finished,
     ExitingGame,
 }
