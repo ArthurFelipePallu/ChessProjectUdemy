@@ -1,4 +1,5 @@
 ﻿using Chess_Console_Project.Board.Exceptions;
+using Chess_Console_Project.Chess.Exceptions;
 
 namespace Chess_Console_Project.Board;
 

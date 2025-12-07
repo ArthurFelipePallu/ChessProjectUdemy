@@ -30,6 +30,6 @@ public class Position
     }
     public override string ToString()
     {
-        return "L: " + Row + ", " + "C: " + Column;
+        return $"L:{Row}, C:{Column}";
     }
 }

@@ -18,7 +18,7 @@ public class ChessBoard
 
     
     /// <summary>
-    /// ADD PIECE METHODS
+    /// ADD PIECE TO BOARD METHODS
     /// </summary>
     public void AddWhitePieceOfTypeAtPosition(PieceType pieceType, Position position)
     {
@@ -57,6 +57,9 @@ public class ChessBoard
     }
 
 
+    
+    
+    
     /// <summary>
     /// REMOVE PIECE METHODS
     /// </summary>
@@ -75,8 +78,19 @@ public class ChessBoard
         Board[row, col] = null;
         return removedPiece;
     }
-    
-    
+
+
+    /// <summary>
+    /// PUT PIECES METHOD
+    /// </summary>
+    public void PutPieceAtDestinationPosition(Piece piece , Position destination)
+    {
+        PutPieceAtDestinationCoordinates(piece,destination.Row,destination.Column);
+    }
+    private void PutPieceAtDestinationCoordinates(Piece piece , int row , int col)
+    {
+        Board[row, col] = piece;
+    }
     
     /// <summary>
     /// VERIFICATION METHODS
@@ -123,21 +137,21 @@ public class ChessBoard
     /// <summary>
     /// VALIDATION METHODS
     /// </summary>
-    private void ValidateNewPiecePositionNotTaken(Position pos)
+    public void ValidateNewPiecePositionNotTaken(Position pos)
     {
         if (HasPieceAtPosition(pos))
         {
             throw new BoardException($"[CHESS BOARD] Tried to Put a New Piece at {pos.ToString()} but there already is a piece {AccessPieceAtPosition(pos).GetPieceTypeAsString()} at this position");
         }
     }
-    private void ValidateNewPiecePositionNotTaken(int row, int column)
+    public void ValidateNewPiecePositionNotTaken(int row, int column)
     {
         if (HasPieceAtCoordinate(row, column))
         {
             throw new BoardException($"[CHESS BOARD] There already is a piece{AccessPieceAtCoordinates(row,column).GetPieceTypeAsString()} at this position");
         }
     }
-    private void ValidateBoardPosition(Position position)
+    public void ValidateBoardPosition(Position position)
     {
         ValidateBoardCoordinates(position.Row, position.Column);
     }
