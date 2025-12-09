@@ -43,6 +43,7 @@ public class ChessMatch
                 _matchStatus = MatchStatus.Playing;
                 break;
             case MatchStatus.Playing:
+                Console.Clear();
                 try
                 {
                     PrintBoard();
@@ -50,7 +51,7 @@ public class ChessMatch
                     var originChessNotationPositionPosition = AskForChessNotationPosition();
                     var piece = _chessBoard.AccessPieceAtChessNotationPosition(originChessNotationPositionPosition);
                     piece.CalculatePossibleMoves();
-                    piece.PrintPossibleMoves();
+                    piece.PrintPiecePossibleMovesExtension();
                     
                     var destinationChessNotationPositionPosition = AskForChessNotationPosition();
                     ExecuteMovement(originChessNotationPositionPosition.ToPosition(), destinationChessNotationPositionPosition.ToPosition());
