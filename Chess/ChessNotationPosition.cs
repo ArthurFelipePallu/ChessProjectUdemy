@@ -43,6 +43,6 @@ public struct ChessNotationPosition
 
     public override string ToString()
     {
-        return $"[CHESS NOTATION POSITION[:  [{_col}{_row}]";
+        return $"[{_col}{_row}]";
     }
 }

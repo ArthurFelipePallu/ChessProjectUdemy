@@ -60,6 +60,19 @@ public abstract class Piece
         return CoordinatesIsInPossibleMoves(pos.Row, pos.Column);
     }
 
+    public bool HasAtLeastOnePossibleMove()
+    {
+        for (var i = 0; i < PossibleMoves.GetLength(0) - 1; i++)
+        {
+            for (var j = 0; j < PossibleMoves.GetLength(1) -1 ; j++)
+            {
+                if (PossibleMoves[i, j])
+                    return true;
+            }
+        }
+
+        return false;
+    }
     public bool[,] GetAllPossibleMoves()
     {
         return PossibleMoves;
@@ -142,7 +155,6 @@ public abstract class Piece
         }
         catch (BoardException e)
         {
-            Console.WriteLine(e);
             return MovementType.IllegalMove;
         }
 

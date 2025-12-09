@@ -50,14 +50,33 @@ public class ChessMatch
                     AnnouncePlayerToMove();
                     var originChessNotationPositionPosition = AskPlayerForPieceInBoard();
                     var piece = _chessBoard.AccessPieceAtChessNotationPosition(originChessNotationPositionPosition);
+                    if (piece == null)
+                    {
+                        Console.WriteLine($"No piece at {originChessNotationPositionPosition}");
+                        
+                        PressEnterToContinue();
+                        break;
+                    }
                     piece.CalculatePossibleMoves();
-                    
+                    if( !piece.HasAtLeastOnePossibleMove())
+                    {
+                        Console.WriteLine($"The Selected {piece} has no legal moves , please select another piece");
+                        PressEnterToContinue();
+                        break;
+                    }
                     Console.Clear();
                     PrintBoardWithPiecePossibleMovements(piece.GetAllPossibleMoves());
                     // piece.PrintPiecePossibleMovesExtension();
                     
-                    var destinationChessNotationPositionPosition = AskPlayerForPieceDestinationInBoard(piece);
-                    ExecuteMovement(originChessNotationPositionPosition.ToPosition(), destinationChessNotationPositionPosition.ToPosition());
+                    var destinationChessNotationPosition = AskPlayerForPieceDestinationInBoard(piece);
+
+                    if (!piece.PositionIsInPossibleMoves(destinationChessNotationPosition.ToPosition()))
+                    {
+                        Console.WriteLine($"The {piece} can not move to the {destinationChessNotationPosition} square");
+                        PressEnterToContinue();
+                        break;
+                    }
+                    ExecuteMovement(originChessNotationPositionPosition.ToPosition(), destinationChessNotationPosition.ToPosition());
                 }
                 catch (Exception e)
                 {
@@ -67,8 +86,6 @@ public class ChessMatch
                 
                 PressEnterToContinue();
 
-                
-                ChangePlayerToMove();
                 
                 break;
             case MatchStatus.ExitingGame:
@@ -188,6 +205,7 @@ public class ChessMatch
             Console.WriteLine("[CHESS MATCH] [ MOVEMENT ] Problem with movement ");
             Console.WriteLine(e.Message);
         }
+        ChangePlayerToMove();
     }
 
     private void PieceAtPositionExistsAndBelongsToPlayer(Position pos)
