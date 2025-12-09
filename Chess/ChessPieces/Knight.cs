@@ -13,7 +13,7 @@ public class Knight : Piece
         ChessNotation = 'N';
         PieceType = PieceType.Knight;
     }
-    protected override void CalculatePossibleMoves()
+    public override void CalculatePossibleMoves()
     {
         throw new NotImplementedException();
     }

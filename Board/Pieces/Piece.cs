@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using Chess_Console_Project.Board.Exceptions;
+using Chess_Console_Project.Chess.Enums;
 
 namespace Chess_Console_Project.Board.Pieces;
 
@@ -12,7 +13,7 @@ public abstract class Piece
     public int Value;
     public string Name;
     protected char ChessNotation;
-    public Position Position;
+    public Position PiecePosition;
     public ChessBoard Board;
     private PieceColor _pieceColor;
     protected PieceType PieceType;
@@ -30,26 +31,29 @@ public abstract class Piece
 
     public void SetPiecePosition(Position position)
     {
-        Position = position;
+        PiecePosition = position;
     }
-    
+
     /// <summary>
     /// PIECE MOVEMENTS
     /// </summary>
+
+    public bool PositionIsInPossibleMoves(Position pos)
+    {
+        return PossibleMoves[pos.Row, pos.Column];
+    }
     public void IncreaseTimesMoved()
     {
         TimesMoved++;
     }
-
-    protected abstract void CalculatePossibleMoves();
-
-    protected void PrintPossibleMoves()
+    public abstract void CalculatePossibleMoves();
+    public void PrintPossibleMoves()
     {
         for (int i = 0; i < Board.MaxChessBoardSize; i++)
         {
             for (int j = 0; j < Board.MaxChessBoardSize; j++)
             {
-                Console.Write(PossibleMoves[i, j]);
+                Console.Write( PossibleMoves[i, j] ? " X " : " - ");
             }
             Console.WriteLine();
         }
@@ -63,13 +67,52 @@ public abstract class Piece
                 PossibleMoves[i, j] = false;
             }
         }
-    }
-
-    protected void CheckIfCanMoveToPosition(Position pos)
+    } 
+    protected void CheckPossibleMovesInDirection(HorizontalDirections hDirection, VerticalDirections vDirection,int maxDistantMovesToCheck = 99 , MovementType hasToBeOfMovementType = MovementType.Any)
     {
-        PossibleMoves[pos.Row,pos.Column] = CanMoveTo(pos);
+        var countHelper = 0;
+        var keepGoing = true;
+
+        var possibleMovePosX = 0;
+        var possibleMovePosY = 0;
+
+        var possiblePosition = new Position(possibleMovePosX, possibleMovePosY);
+        while (keepGoing)
+        {
+            countHelper++;
+            possibleMovePosX = Math.Clamp( PiecePosition.Row + (countHelper * (int)hDirection),0,Board.MaxChessBoardSize-1 );
+            possibleMovePosY = Math.Clamp(PiecePosition.Column + (countHelper * (int)vDirection),0,Board.MaxChessBoardSize-1);
+            possiblePosition.SetPosition(possibleMovePosX, possibleMovePosY);
+
+            var move = CheckMovementTypeAt(possiblePosition);
+
+            if (hasToBeOfMovementType != MovementType.Any)
+            {
+                if(move == hasToBeOfMovementType)
+                    SetPositionAsPossibleMove(possiblePosition);
+                return;
+            }
+            
+
+            if(move == MovementType.Take || move == MovementType.IllegalMove)
+                keepGoing = false;
+            else
+            {
+                SetPositionAsPossibleMove(possiblePosition);
+            }
+            if(countHelper >= maxDistantMovesToCheck)
+                keepGoing = false;
+        }
     }
-    private bool CanMoveTo(Position position)
+    protected MovementType CheckPossiblePositionAndAdd(Position pos)
+    {
+        var move = CheckMovementTypeAt(pos);
+        if(move != MovementType.IllegalMove)
+            SetPositionAsPossibleMove(pos);
+
+        return move;
+    }
+    private MovementType CheckMovementTypeAt(Position position)
     {
         try
         {
@@ -78,13 +121,25 @@ public abstract class Piece
         catch (BoardException e)
         {
             Console.WriteLine(e);
-            return false;
+            return MovementType.IllegalMove;
         }
+
+        var piece = Board.AccessPieceAtPosition(position);
         
-        if (!Board.HasPieceAtPosition(position)) return true;
+        if (piece == null)
+            return MovementType.Move;
         
-       return  Board.BoardPositionHasPieceOfColor(position) != _pieceColor;
+        if (piece.GetPieceColor() == _pieceColor)
+            return MovementType.IllegalMove;
+        
+        return piece.GetPieceType() == PieceType.King ? MovementType.Check : MovementType.Take;
     }
+    private void SetPositionAsPossibleMove(Position pos)
+    {
+        PossibleMoves[pos.Row,pos.Column] = true;
+    }
+    
+    
     
     /// <summary>
     /// PIECE TYPE

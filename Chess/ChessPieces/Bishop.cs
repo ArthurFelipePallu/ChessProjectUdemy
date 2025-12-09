@@ -1,5 +1,6 @@
 ﻿using Chess_Console_Project.Board;
 using Chess_Console_Project.Board.Pieces;
+using Chess_Console_Project.Chess.Enums;
 
 namespace Chess_Console_Project.Chess.ChessPieces;
 
@@ -14,8 +15,20 @@ public class Bishop : Piece
         PieceType = PieceType.Bishop;
     }
 
-    protected override void CalculatePossibleMoves()
+    public override void CalculatePossibleMoves()
     {
-        throw new NotImplementedException();
+        ClearPossibleMoves();
+        
+        //Direção Diagonal Esquerda para Cima
+        CheckPossibleMovesInDirection(HorizontalDirections.Left,VerticalDirections.Up);
+
+        //Direção Diagonal Direita para Cima
+        CheckPossibleMovesInDirection(HorizontalDirections.Right,VerticalDirections.Up);
+        
+        //Direção Diagonal Esquerda para Baixo
+        CheckPossibleMovesInDirection(HorizontalDirections.Left,VerticalDirections.Down);
+        
+        //Direção Diagonal Direita para Baixo
+        CheckPossibleMovesInDirection(HorizontalDirections.Right,VerticalDirections.Down);
     }
 }

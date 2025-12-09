@@ -1,5 +1,6 @@
 ﻿using Chess_Console_Project.Board;
 using Chess_Console_Project.Board.Pieces;
+using Chess_Console_Project.Chess.Enums;
 
 namespace Chess_Console_Project.Chess.ChessPieces;
 
@@ -14,8 +15,23 @@ public class Pawn : Piece
         PieceType = PieceType.Pawn;
     }
     
-    protected override void CalculatePossibleMoves()
+    public override void CalculatePossibleMoves()
     {
-        throw new NotImplementedException();
+        ClearPossibleMoves();
+
+        var firstPawnMove = TimesMoved == 0 ? 2 : 1;
+
+        var vDir = GetPieceColor() == PieceColor.White ? VerticalDirections.Up : VerticalDirections.Down;
+        
+        //Posição de Cima
+        CheckPossibleMovesInDirection(HorizontalDirections.None,vDir,firstPawnMove);
+        
+        //Posição de Cima e Esquerda e precisa ser Movimento de Captura
+        CheckPossibleMovesInDirection(HorizontalDirections.Left,vDir,1,MovementType.Take);
+
+        //Posição de Cima e Direita e precisa ser Movimento de Captura
+        CheckPossibleMovesInDirection(HorizontalDirections.Right,vDir,1,MovementType.Take);
     }
+
+
 }

@@ -1,5 +1,6 @@
 ﻿using Chess_Console_Project.Board;
 using Chess_Console_Project.Board.Pieces;
+using Chess_Console_Project.Chess.Enums;
 
 namespace Chess_Console_Project.Chess.ChessPieces;
 
@@ -13,41 +14,34 @@ public class King : Piece
         ChessNotation = 'K';
         PieceType = PieceType.King;
     }
-    protected override void CalculatePossibleMoves()
+    public override void CalculatePossibleMoves()
     {
         ClearPossibleMoves();
 
         //Posição de Cima
-        var pos = new Position(Position.Row -1, Position.Column);
-        CheckIfCanMoveToPosition(pos);
+        CheckPossibleMovesInDirection(HorizontalDirections.None,VerticalDirections.Up,1);
         
         //Posição de Cima e Esquerda
-        pos = new Position(Position.Row -1, Position.Column - 1);
-        CheckIfCanMoveToPosition(pos);
+        CheckPossibleMovesInDirection(HorizontalDirections.Left,VerticalDirections.Up,1);
 
         //Posição de Cima e Direita
-        pos = new Position(Position.Row -1, Position.Column + 1);
-        CheckIfCanMoveToPosition(pos);
+        CheckPossibleMovesInDirection(HorizontalDirections.Right,VerticalDirections.Up,1);
         
-        //Posição de Cima e Esquerda
-        pos = new Position(Position.Row, Position.Column - 1);
-        CheckIfCanMoveToPosition(pos);
+        //Posição Esquerda
+        CheckPossibleMovesInDirection(HorizontalDirections.Left,VerticalDirections.None,1);
 
-        //Posição de Cima e Direita
-        pos = new Position(Position.Row, Position.Column + 1);
-        CheckIfCanMoveToPosition(pos);
+        //Posição Direita
+        CheckPossibleMovesInDirection(HorizontalDirections.Right,VerticalDirections.None,1);
 
         //Posição de Baixo
-        pos = new Position(Position.Row + 1, Position.Column);
-        CheckIfCanMoveToPosition(pos);
+        CheckPossibleMovesInDirection(HorizontalDirections.None,VerticalDirections.Down,1);
         
         //Posição de Baixo e Esquerda
-        pos = new Position(Position.Row + 1, Position.Column - 1);
-        CheckIfCanMoveToPosition(pos);
-
+        CheckPossibleMovesInDirection(HorizontalDirections.Left,VerticalDirections.Down,1);
+        
         //Posição de Baixo e Direita
-        pos = new Position(Position.Row + 1, Position.Column + 1);
-        CheckIfCanMoveToPosition(pos);
+        CheckPossibleMovesInDirection(HorizontalDirections.Right,VerticalDirections.Down,1);
+        
         
     }
     

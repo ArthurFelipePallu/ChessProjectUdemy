@@ -47,9 +47,13 @@ public class ChessMatch
                 {
                     PrintBoard();
                     AnnouncePlayerToMove();
-                    var originPosition = AskForChessNotationPosition();
-                    var destinationPosition = AskForChessNotationPosition();
-                    ExecuteMovement(originPosition.ToPosition(), destinationPosition.ToPosition());
+                    var originChessNotationPositionPosition = AskForChessNotationPosition();
+                    var piece = _chessBoard.AccessPieceAtChessNotationPosition(originChessNotationPositionPosition);
+                    piece.CalculatePossibleMoves();
+                    piece.PrintPossibleMoves();
+                    
+                    var destinationChessNotationPositionPosition = AskForChessNotationPosition();
+                    ExecuteMovement(originChessNotationPositionPosition.ToPosition(), destinationChessNotationPositionPosition.ToPosition());
                 }
                 catch (Exception e)
                 {
@@ -147,7 +151,7 @@ public class ChessMatch
             PieceAtPositionExistsAndBelongsToPlayer(origin);
             DestinationPositionCanBeMovedToOrTaken(destination);
     
-            var action =MovePieceFromTo(origin,destination);
+            var action = MovePieceFromTo(origin,destination);
             
             PrintBoard();
             Console.ForegroundColor = ConsoleColor.White;

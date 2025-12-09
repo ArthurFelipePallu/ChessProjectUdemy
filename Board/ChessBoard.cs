@@ -86,6 +86,7 @@ public class ChessBoard
     public void PutPieceAtDestinationPosition(Piece piece , Position destination)
     {
         PutPieceAtDestinationCoordinates(piece,destination.Row,destination.Column);
+        piece.SetPiecePosition(destination);
     }
     private void PutPieceAtDestinationCoordinates(Piece piece , int row , int col)
     {
