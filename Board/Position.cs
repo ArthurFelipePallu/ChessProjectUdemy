@@ -23,14 +23,10 @@ public class Position
     
     private void ValidateRow(int row)
     {
-        if(row is < 0 or > MaxChessBoardSize -1)
-            throw new BoardException($"[POSITION] Row {row} is out of range [0 - 7] ");
         Row = row;
     }
     private void ValidateColumn(int col)
     {
-        if(col is < 0 or > MaxChessBoardSize-1)
-            throw new BoardException($"[POSITION] Column {col} is out of range [0 - 7] ");
         Column = col;
     }
     public override string ToString()
