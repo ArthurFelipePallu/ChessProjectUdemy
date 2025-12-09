@@ -5,6 +5,8 @@ namespace Chess_Console_Project.Board;
 public static class BoardExtensions
 {
     
+    
+    
     /// <summary>
     /// CREATE BOARD
     /// </summary>
@@ -84,10 +86,36 @@ public static class BoardExtensions
         board.WriteColumnNames();
     }
     
+    public static void PrintBoardExtension(this ChessBoard board , bool[,] possiblePieceMoves)
+        {
+            for (var i = 0; i < board.MaxChessBoardSize; i++)
+            {
+                board.WriteRowName(i);
+                for (var j = 0; j < board.MaxChessBoardSize; j++)
+                {
+                    board.BoardBackGroundColor(i,j , possiblePieceMoves[i,j]);
+                    var piece = board.AccessPieceAtCoordinates(i, j);
+                    Console.ForegroundColor = piece?.GetPieceConsoleColor() ?? ConsoleColor.DarkGray;
+                    var toWrite = piece?.GetPieceNotation() ?? "   ";
+                    
+                    Console.Write(toWrite);
+                    
+                }
+                
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.WriteLine(); // QUEBRA LINHA
+            }
+    
+            board.WriteSeparationLine();
+            board.WriteColumnNames();
+        }
+    
 
-    private static void BoardBackGroundColor(this ChessBoard board, int i, int j)
+    private static void BoardBackGroundColor(this ChessBoard board, int i, int j, bool pieceMovementIsPossible = false)
     {
-        Console.BackgroundColor = ((i+j) %2) != 0 ? ConsoleColor.DarkGray : ConsoleColor.Gray;   
+        Console.BackgroundColor = ((i+j) %2) != 0 ?  
+                                    pieceMovementIsPossible ? ChessBoard.PossibleMoveLightColor: ChessBoard.BoardLightColor :
+                                    pieceMovementIsPossible ? ChessBoard.PossibleMoveDarkColor: ChessBoard.BoardDarkColor; ;   
     }
     
     

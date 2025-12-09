@@ -48,12 +48,15 @@ public class ChessMatch
                 {
                     PrintBoard();
                     AnnouncePlayerToMove();
-                    var originChessNotationPositionPosition = AskForChessNotationPosition();
+                    var originChessNotationPositionPosition = AskPlayerForPieceInBoard();
                     var piece = _chessBoard.AccessPieceAtChessNotationPosition(originChessNotationPositionPosition);
                     piece.CalculatePossibleMoves();
-                    piece.PrintPiecePossibleMovesExtension();
                     
-                    var destinationChessNotationPositionPosition = AskForChessNotationPosition();
+                    Console.Clear();
+                    PrintBoardWithPiecePossibleMovements(piece.GetAllPossibleMoves());
+                    // piece.PrintPiecePossibleMovesExtension();
+                    
+                    var destinationChessNotationPositionPosition = AskPlayerForPieceDestinationInBoard(piece);
                     ExecuteMovement(originChessNotationPositionPosition.ToPosition(), destinationChessNotationPositionPosition.ToPosition());
                 }
                 catch (Exception e)
@@ -117,7 +120,11 @@ public class ChessMatch
         Console.Clear();
         _chessBoard.PrintBoardExtension();
     }
-
+    private void PrintBoardWithPiecePossibleMovements(bool[,] possibleMoves)
+    {
+        Console.Clear();
+        _chessBoard.PrintBoardExtension(possibleMoves);
+    }
 
 
     /// <summary>
@@ -127,9 +134,21 @@ public class ChessMatch
     {
         _movesCount++;
     }
-    private ChessNotationPosition AskForChessNotationPosition()
+
+    private ChessNotationPosition AskPlayerForPieceInBoard()
     {
         Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine($"Choose a Piece to move");
+        return GetChessNotationPosition();
+    }
+    private ChessNotationPosition AskPlayerForPieceDestinationInBoard(Piece piece)
+    {
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine($"Choose a Position to move your {piece} ");
+        return GetChessNotationPosition();
+    }
+    private ChessNotationPosition GetChessNotationPosition()
+    {
 
         Console.WriteLine($"Specify a Column [a - h] or [A - H] followed by a Row [1 - 8]. {Environment.NewLine} EX : 'A2' or 'a2'    ");
         var notation =  Console.ReadLine();
@@ -259,13 +278,10 @@ public class ChessMatch
     {
         throw new ChessException($"[CHESS MATCH] AnotHer player already is playing as {player.PlayingAs()}");
     }
-
-    
     private ChessPlayer PlayerToMove()
     {
         return _toPlay == PieceColor.White ? _playerWhite : _playerBlack;
     }
-
     private void AnnouncePlayerToMove()
     {
         var player = PlayerToMove();

@@ -59,6 +59,11 @@ public abstract class Piece
     {
         return CoordinatesIsInPossibleMoves(pos.Row, pos.Column);
     }
+
+    public bool[,] GetAllPossibleMoves()
+    {
+        return PossibleMoves;
+    }
     public bool CoordinatesIsInPossibleMoves(int row,int col)
     {
         return PossibleMoves[row, col];
@@ -90,8 +95,8 @@ public abstract class Piece
         while (keepGoing)
         {
             countHelper++;
-            possibleMovePosX = Math.Clamp( PiecePosition.Row + (countHelper * (int)vDirection),0,Board.MaxChessBoardSize-1 );
-            possibleMovePosY = Math.Clamp(PiecePosition.Column + (countHelper * (int)hDirection),0,Board.MaxChessBoardSize-1);
+            possibleMovePosX = PiecePosition.Row + (countHelper * (int)vDirection);
+            possibleMovePosY = PiecePosition.Column + (countHelper * (int)hDirection);
             possiblePosition.SetPosition(possibleMovePosX, possibleMovePosY);
 
             var move = CheckMovementTypeAt(possiblePosition);
