@@ -29,35 +29,45 @@ public abstract class Piece
         PossibleMoves = new bool[Board.MaxChessBoardSize, Board.MaxChessBoardSize];
     }
 
+
+
+
+    /// <summary>
+    /// PIECE POSITION METHODS
+    /// </summary>
+
+    public bool IsCurrentlyAtCoordinates(int row, int col)
+    {
+        return PiecePosition.Row == row && PiecePosition.Column == col;
+    }
+    
+
     public void SetPiecePosition(Position position)
     {
         PiecePosition = position;
     }
 
+    
+    
+    
+    
+    
     /// <summary>
     /// PIECE MOVEMENTS
     /// </summary>
-
     public bool PositionIsInPossibleMoves(Position pos)
     {
-        return PossibleMoves[pos.Row, pos.Column];
+        return CoordinatesIsInPossibleMoves(pos.Row, pos.Column);
+    }
+    public bool CoordinatesIsInPossibleMoves(int row,int col)
+    {
+        return PossibleMoves[row, col];
     }
     public void IncreaseTimesMoved()
     {
         TimesMoved++;
     }
     public abstract void CalculatePossibleMoves();
-    public void PrintPossibleMoves()
-    {
-        for (int i = 0; i < Board.MaxChessBoardSize; i++)
-        {
-            for (int j = 0; j < Board.MaxChessBoardSize; j++)
-            {
-                Console.Write( PossibleMoves[i, j] ? " X " : " - ");
-            }
-            Console.WriteLine();
-        }
-    }
     protected void ClearPossibleMoves()
     {
         for (int i = 0; i < Board.MaxChessBoardSize; i++)
@@ -80,8 +90,8 @@ public abstract class Piece
         while (keepGoing)
         {
             countHelper++;
-            possibleMovePosX = Math.Clamp( PiecePosition.Row + (countHelper * (int)hDirection),0,Board.MaxChessBoardSize-1 );
-            possibleMovePosY = Math.Clamp(PiecePosition.Column + (countHelper * (int)vDirection),0,Board.MaxChessBoardSize-1);
+            possibleMovePosX = Math.Clamp( PiecePosition.Row + (countHelper * (int)vDirection),0,Board.MaxChessBoardSize-1 );
+            possibleMovePosY = Math.Clamp(PiecePosition.Column + (countHelper * (int)hDirection),0,Board.MaxChessBoardSize-1);
             possiblePosition.SetPosition(possibleMovePosX, possibleMovePosY);
 
             var move = CheckMovementTypeAt(possiblePosition);
@@ -94,17 +104,24 @@ public abstract class Piece
             }
             
 
-            if(move == MovementType.Take || move == MovementType.IllegalMove)
-                keepGoing = false;
-            else
+            switch (move)
             {
-                SetPositionAsPossibleMove(possiblePosition);
+                case MovementType.IllegalMove:
+                    keepGoing = false;
+                    break;
+                case MovementType.Take:
+                    SetPositionAsPossibleMove(possiblePosition);
+                    keepGoing = false;
+                    break;
+                default:
+                    SetPositionAsPossibleMove(possiblePosition);
+                    break;
             }
             if(countHelper >= maxDistantMovesToCheck)
                 keepGoing = false;
         }
     }
-    protected MovementType CheckPossiblePositionAndAdd(Position pos)
+    protected MovementType TryPositionPossibleMove(Position pos)
     {
         var move = CheckMovementTypeAt(pos);
         if(move != MovementType.IllegalMove)
