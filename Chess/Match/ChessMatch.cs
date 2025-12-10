@@ -1,10 +1,7 @@
-﻿using System.Drawing;
-using System.Runtime.Intrinsics.X86;
-using Chess_Console_Project.Board;
-using Chess_Console_Project.Board.Exceptions;
-using Chess_Console_Project.Board.Pieces;
-using Chess_Console_Project.Chess.Exceptions;
+﻿using Chess_Console_Project.Board;
 using Chess_Console_Project.Chess.Player;
+using Chess_Console_Project.Board.Exceptions;
+using Chess_Console_Project.Chess.Exceptions;
 
 namespace Chess_Console_Project.Chess.Match;
 
@@ -13,14 +10,14 @@ public class ChessMatch
     private int _movesCount = 0;
     ChessBoard _chessBoard;
     MatchStatus _matchStatus;
-    
     private PieceColor _toPlay = PieceColor.White;
-    
+    private Screen _screen;
     private ChessPlayer _playerWhite;
     private ChessPlayer _playerBlack;
 
     public ChessMatch()
     {
+        _screen = new Screen();
         _matchStatus = MatchStatus.WaitingForPlayers;
     }
 
@@ -33,7 +30,7 @@ public class ChessMatch
         {
             case MatchStatus.WaitingForPlayers:
                 WaitForPlayers();
-                PressEnterToContinue();
+                _screen.ScreenWriteAndWaitForEnterToContinue("Players have gathered, Starting Game");
                 break;
             case MatchStatus.WaitingForPlayer:
                 break;
@@ -43,37 +40,31 @@ public class ChessMatch
                 _matchStatus = MatchStatus.Playing;
                 break;
             case MatchStatus.Playing:
-                Console.Clear();
                 try
                 {
-                    PrintBoard();
-                    AnnouncePlayerToMove();
-                    var originChessNotationPositionPosition = AskPlayerForPieceInBoard();
+                    _screen.PrintBoardAndPlayerToMove(_chessBoard,PlayerToMove());
+
+                    var originChessNotationPositionPosition = _screen.AskPlayerForPieceInBoard();
                     var piece = _chessBoard.AccessPieceAtChessNotationPosition(originChessNotationPositionPosition);
                     if (piece == null)
                     {
-                        Console.WriteLine($"No piece at {originChessNotationPositionPosition}");
-                        
-                        PressEnterToContinue();
+                        _screen.ScreenWriteAndWaitForEnterToContinue($"No piece at {originChessNotationPositionPosition}");
                         break;
                     }
                     piece.CalculatePossibleMoves();
                     if( !piece.HasAtLeastOnePossibleMove())
                     {
-                        Console.WriteLine($"The Selected {piece} has no legal moves , please select another piece");
-                        PressEnterToContinue();
+                        _screen.ScreenWriteAndWaitForEnterToContinue($"The Selected {piece} has no legal moves , please select another piece");
                         break;
                     }
-                    Console.Clear();
-                    PrintBoardWithPiecePossibleMovements(piece.GetAllPossibleMoves());
-                    // piece.PrintPiecePossibleMovesExtension();
                     
-                    var destinationChessNotationPosition = AskPlayerForPieceDestinationInBoard(piece);
+                    _screen.PrintBoardWithPiecePossibleMovements(_chessBoard,piece.GetAllPossibleMoves());
+                    
+                    var destinationChessNotationPosition = _screen.AskPlayerForPieceDestinationInBoard(piece);
 
                     if (!piece.PositionIsInPossibleMoves(destinationChessNotationPosition.ToPosition()))
                     {
-                        Console.WriteLine($"The {piece} can not move to the {destinationChessNotationPosition} square");
-                        PressEnterToContinue();
+                        _screen.ScreenWriteAndWaitForEnterToContinue($"The {piece} can not move to the {destinationChessNotationPosition} square");
                         break;
                     }
                     ExecuteMovement(originChessNotationPositionPosition.ToPosition(), destinationChessNotationPosition.ToPosition());
@@ -83,10 +74,7 @@ public class ChessMatch
                     Console.WriteLine(e);
                     throw;
                 }
-                
-                PressEnterToContinue();
-
-                
+                _screen.ScreenWriteAndWaitForEnterToContinue($"{PlayerToMove().Name}'s turn is over ");
                 break;
             case MatchStatus.ExitingGame:
                 break;
@@ -112,17 +100,7 @@ public class ChessMatch
         return _matchStatus == MatchStatus.Finished;
     }
 
-    private void PressEnterToContinue()
-    {
-        ConsoleKeyInfo keyInfo = new ConsoleKeyInfo();
-        
-        while (keyInfo.Key != ConsoleKey.Enter)
-        {
-            Console.WriteLine("Press Enter To Continue");
-            keyInfo = Console.ReadKey(true);
-            Console.Clear();
-        }
-    }
+
 
     /// <summary>
     /// BOARD METHODS
@@ -132,16 +110,7 @@ public class ChessMatch
         _chessBoard = new ChessBoard();
         _chessBoard.CreateChessBoardInitialPosition();
     }
-    private void PrintBoard()
-    {
-        Console.Clear();
-        _chessBoard.PrintBoardExtension();
-    }
-    private void PrintBoardWithPiecePossibleMovements(bool[,] possibleMoves)
-    {
-        Console.Clear();
-        _chessBoard.PrintBoardExtension(possibleMoves);
-    }
+
 
 
     /// <summary>
@@ -151,32 +120,6 @@ public class ChessMatch
     {
         _movesCount++;
     }
-
-    private ChessNotationPosition AskPlayerForPieceInBoard()
-    {
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine($"Choose a Piece to move");
-        return GetChessNotationPosition();
-    }
-    private ChessNotationPosition AskPlayerForPieceDestinationInBoard(Piece piece)
-    {
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine($"Choose a Position to move your {piece} ");
-        return GetChessNotationPosition();
-    }
-    private ChessNotationPosition GetChessNotationPosition()
-    {
-
-        Console.WriteLine($"Specify a Column [a - h] or [A - H] followed by a Row [1 - 8]. {Environment.NewLine} EX : 'A2' or 'a2'    ");
-        var notation =  Console.ReadLine();
-
-        if (notation == null || notation.Length != 2) throw new ChessException("[ CHESS MATCH] Notation specified by player is in wrong format");
-        var col = notation[0];
-        var row = (int)notation[1] - '0';
-
-        return new ChessNotationPosition( row,col);
-    }
-
     private void ExecuteMovement(Position origin, Position destination)
     {
         try
@@ -188,37 +131,30 @@ public class ChessMatch
             PieceAtPositionExistsAndBelongsToPlayer(origin);
             DestinationPositionCanBeMovedToOrTaken(destination);
     
-            var action = MovePieceFromTo(origin,destination);
+            var actionMessage = MovePieceFromTo(origin,destination);
             
-            PrintBoard();
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(action);
-            
+            _screen.PrintBoard(_chessBoard);
+            _screen.ScreenWriteAndWaitForEnterToContinue(actionMessage);
+
         }
         catch (BoardException e)
         {
-            Console.WriteLine("[CHESS MATCH] [CHESS BOARD] Problem with Board");
-            Console.WriteLine(e.Message);
+            _screen.ScreenWriteAndWaitForEnterToContinue("[CHESS MATCH] [CHESS BOARD] Problem with Board" + e.Message);
         }
         catch (MovementException e)
         {
-            Console.WriteLine("[CHESS MATCH] [ MOVEMENT ] Problem with movement ");
-            Console.WriteLine(e.Message);
+            _screen.ScreenWriteAndWaitForEnterToContinue("[CHESS MATCH] [ MOVEMENT ] Problem with movement " + e.Message);
         }
         ChangePlayerToMove();
     }
-
     private void PieceAtPositionExistsAndBelongsToPlayer(Position pos)
     {
         var piece = _chessBoard.AccessPieceAtPosition(pos);
         if (piece == null)
             throw new MovementException($"[ CHESS MATCH ] Piece at position {pos.ToString()} does not exist");
-        
-        
         // If piece does not exists or is a piece that does not belongs to the current player
         if (piece.GetPieceColor() != _toPlay)
             throw new MovementException($"[ CHESS MATCH ] Piece at position {pos.ToString()} does not belong to player {_toPlay.ToString()}");
-            
     }
 
     private void DestinationPositionCanBeMovedToOrTaken(Position destination)
@@ -246,7 +182,7 @@ public class ChessMatch
         _chessBoard.PutPieceAtDestinationPosition(originPiece, destination);
         
         return destinationPiece == null
-            ? $"[ CHESS MATCH ] Piece {originPiece} moved to destination {destination.ToString()}"
+            ? $"[ CHESS MATCH ] Piece {originPiece} moved to destination {destination}"
             : $"[ CHESS MATCH ] Piece [{originPiece}] took [{destinationPiece}] at destination [{destination}]";
 
     }
@@ -300,13 +236,6 @@ public class ChessMatch
     {
         return _toPlay == PieceColor.White ? _playerWhite : _playerBlack;
     }
-    private void AnnouncePlayerToMove()
-    {
-        var player = PlayerToMove();
-        
-        Console.ForegroundColor = ConsoleColor.White;
-
-        Console.WriteLine( $"{player.PlayingAs()} Player: {player.Name}'s turn");
-    }
+ 
     
 }
