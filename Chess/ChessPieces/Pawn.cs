@@ -24,7 +24,10 @@ public class Pawn : Piece
         var vDir = GetPieceColor() == PieceColor.White ? VerticalDirections.Up : VerticalDirections.Down;
         
         //Posição de Cima
-        CheckPossibleMovesInDirection(HorizontalDirections.None,vDir,firstPawnMove);
+        var hasPieceAhead = Board.HasPieceAtCoordinate( PiecePosition.Row + ((int)vDir * firstPawnMove) , PiecePosition.Column );
+        
+        if(!hasPieceAhead)
+            CheckPossibleMovesInDirection(HorizontalDirections.None,vDir,firstPawnMove);
         
         //Posição de Cima e Esquerda e precisa ser Movimento de Captura
         CheckPossibleMovesInDirection(HorizontalDirections.Left,vDir,1,MovementType.Take);

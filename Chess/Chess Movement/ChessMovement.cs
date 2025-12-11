@@ -56,8 +56,15 @@ public class ChessMovement
         {
             return destination.ToString().ToLower();
         }
-        
-        return $"{piece.GetPieceNotation()} {destination.ToString().ToLower()}";
+
+        if (piece.GetPieceType() == PieceType.Rook || 
+            piece.GetPieceType() == PieceType.Bishop ||
+            piece.GetPieceType() == PieceType.Knight )
+        {
+            //CHECK IF OTHER PIECE OF THE SAME TYPE CAN ALSO REACH 
+            
+        }
+        return $"{piece.GetPieceNotation()}{destination.ToString()}";
     }
     // private string GetTakeChessNotation()
     // {
