@@ -7,11 +7,29 @@ namespace Chess_Console_Project.Chess;
 
 public class Screen
 {
+    private string _emptySquare = "   ";
     private const int MaxChessBoardSize = 8;
     private ConsoleColor _currentForeGroundColor = ConsoleColor.White;
+    
+    
+    /// <summary>
+    /// BOARD COLORS
+    /// </summary>
+    private const  ConsoleColor BoardLightColor = ConsoleColor.DarkGray;
+    private const  ConsoleColor BoardDarkColor = ConsoleColor.Gray;
+    private const  ConsoleColor PossibleMoveLightColor = ConsoleColor.DarkRed;
+    private const  ConsoleColor PossibleMoveDarkColor = ConsoleColor.Red;
+
+    
+    /// <summary>
+    /// BOARD COLORS
+    /// </summary>
+    private const  ConsoleColor PiecesLightColor = ConsoleColor.Yellow;
+    private const  ConsoleColor PiecesDarkColor = ConsoleColor.Black;
+    
     public Screen()
     {
-        
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
     }
     
     
@@ -43,11 +61,11 @@ public class Screen
             {
                 BoardBackGroundColor(i,j , possiblePieceMoves[i,j]);
                 var piece = board.AccessPieceAtCoordinates(i, j);
-                ChangeForeGroundColorTo(piece?.GetPieceConsoleColor() ?? ConsoleColor.DarkGray);
-                var toWrite = piece?.GetPieceNotation() ?? "   ";
+                ChangeForeGroundColorTo(GetPieceConsoleColor(piece));
+                var toWrite = GetPieceUnicodeOrEmptySquare(piece);
                 Console.Write(toWrite);
             }
-            ChangeForeGroundColorTo(ConsoleColor.Black);
+            Console.BackgroundColor = ConsoleColor.Black;
             Console.WriteLine(); // QUEBRA LINHA
         }
     
@@ -57,8 +75,8 @@ public class Screen
     private  void BoardBackGroundColor( int i, int j, bool pieceMovementIsPossible = false)
     {
         Console.BackgroundColor = ((i+j) %2) != 0 ?  
-                                    pieceMovementIsPossible ? ChessBoard.PossibleMoveLightColor: ChessBoard.BoardLightColor :
-                                    pieceMovementIsPossible ? ChessBoard.PossibleMoveDarkColor: ChessBoard.BoardDarkColor; ;   
+                                    pieceMovementIsPossible ? PossibleMoveLightColor: BoardLightColor :
+                                    pieceMovementIsPossible ? PossibleMoveDarkColor: BoardDarkColor; ;   
     }
     private void WriteRowName(  int row)
     {
@@ -89,11 +107,61 @@ public class Screen
     }
     
     
+    /// <summary>
+    /// PIECE METHODS
+    /// </summary>
+    private ConsoleColor GetPieceConsoleColor(Piece? piece)
+    {
+        if(piece == null) return BoardLightColor;
+        return piece.GetPieceColor() == PieceColor.Black ? PiecesDarkColor : PiecesLightColor;
+    }
+
+    private string GetPieceUnicodeOrEmptySquare(Piece? piece)
+    {
+        if (piece == null) return _emptySquare;
+        
+        return piece.GetPieceColor() == PieceColor.White ? $" {GetWhitePieceUnicode(piece)} " : $" {GetBlackPieceUnicode(piece)} ";
+        
+    }
+
+    private char GetWhitePieceUnicode(Piece piece)
+    {
+        switch (piece.GetPieceType())
+        {
+            case PieceType.King:
+                return '\u2654';
+            case PieceType.Queen:
+                return '\u2655';
+            case PieceType.Rook:
+                return '\u2656';
+            case PieceType.Knight:
+                return '\u2658';
+            case PieceType.Bishop:
+                return '\u2657';
+            case PieceType.Pawn:
+                return '\u2659';
+        }
+
+        return ' ';
+    }
+    private string GetBlackPieceUnicode(Piece piece)
+    {
+        return piece.GetPieceType() switch
+        {
+            PieceType.King => "\u265a",
+            PieceType.Queen => "\u265b",
+            PieceType.Rook => "\u265c",
+            PieceType.Knight => "\u265e",
+            PieceType.Bishop => "\u265d",
+            PieceType.Pawn => "\u265f",
+            _ => _emptySquare
+        };
+    }
+    
     
     /// <summary>
     /// PLAYER PRINT METHODS
     /// </summary>
-    
     public void PrintBoardAndPlayerToMove(ChessBoard board,ChessPlayer player)
     {
         PrintBoard(board);

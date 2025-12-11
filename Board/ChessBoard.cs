@@ -15,11 +15,6 @@ public class ChessBoard
         Board = new Piece[MaxChessBoardSize, MaxChessBoardSize];
 
     }
-    public const  ConsoleColor BoardLightColor = ConsoleColor.DarkGray;
-    public const  ConsoleColor BoardDarkColor = ConsoleColor.Gray;
-    public const  ConsoleColor PossibleMoveLightColor = ConsoleColor.DarkRed;
-    public const  ConsoleColor PossibleMoveDarkColor = ConsoleColor.Red;
-
     
     /// <summary>
     /// ADD PIECE TO BOARD METHODS
