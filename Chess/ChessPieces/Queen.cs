@@ -9,11 +9,17 @@ public class Queen : Piece
     
     public Queen(ChessBoard board, PieceColor pieceColor) : base(board, pieceColor)
     {
-        Value = 9;
-        Name = "Queen";
+        _value = 9;
+        _name = "Queen";
         ChessNotation = 'Q';
         PieceType = PieceType.Queen;
     }
+
+    public override void AfterMoveVerification()
+    {
+        throw new NotImplementedException();
+    }
+
     public override void CalculatePossibleMoves()
     {
         ClearPossibleMoves();

@@ -9,11 +9,17 @@ public class Rook : Piece
     
     public Rook(ChessBoard board, PieceColor pieceColor) : base(board, pieceColor)
     {
-        Value = 5;
-        Name = "Rook";
+        _value = 5;
+        _name = "Rook";
         ChessNotation = 'R';
         PieceType = PieceType.Rook;
     }
+
+    public override void AfterMoveVerification()
+    {
+        throw new NotImplementedException();
+    }
+
     public override void CalculatePossibleMoves()
     {
         

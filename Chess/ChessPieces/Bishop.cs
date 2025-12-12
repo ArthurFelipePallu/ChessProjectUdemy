@@ -9,10 +9,15 @@ public class Bishop : Piece
     
     public Bishop(ChessBoard board, PieceColor pieceColor) : base(board, pieceColor)
     {
-        Value = 3;
-        Name = "Bishop";
+        _value = 3;
+        _name = "Bishop";
         ChessNotation = 'B';
         PieceType = PieceType.Bishop;
+    }
+
+    public override void AfterMoveVerification()
+    {
+        throw new NotImplementedException();
     }
 
     public override void CalculatePossibleMoves()

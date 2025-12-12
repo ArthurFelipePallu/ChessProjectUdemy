@@ -9,8 +9,8 @@ public class King : Piece
     
     public King(ChessBoard board, PieceColor pieceColor) : base(board, pieceColor)
     {
-        Value = 999;
-        Name = "King";
+        _value = 999;
+        _name = "King";
         ChessNotation = 'K';
         PieceType = PieceType.King;
     }
@@ -44,6 +44,9 @@ public class King : Piece
         
         
     }
-    
-    
+
+    public override void AfterMoveVerification()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -9,24 +9,40 @@ public abstract class Piece
     /// <summary>
     /// PRIVATE
     /// </summary>
+    protected int _value;
+    protected string _name;
+    private bool[,] _possibleMoves;
     
-    public int Value;
-    public string Name;
+    
+    
+    /// <summary>
+    /// PROTECTED
+    /// </summary>
     protected char ChessNotation;
-    public Position PiecePosition;
-    public ChessBoard Board;
-    private PieceColor _pieceColor;
     protected PieceType PieceType;
-    public int TimesMoved {get; protected set;}
-    protected bool[,] PossibleMoves;
+    protected readonly PieceColor PieceColor;
+    protected Position PiecePosition;
+    protected readonly ChessBoard Board;
+    protected int TimesMoved {get; private set;}
+    
+    /// <summary>
+    /// PUBLIC
+    /// </summary>
+   
+    
+    
+    
+    
 
-
+    /// <summary>
+    /// CONSTRUCTOR
+    /// </summary>
     protected Piece(ChessBoard board, PieceColor pieceColor)
     {
-        _pieceColor = pieceColor;
+        PieceColor = pieceColor;
         Board = board;
         TimesMoved = 0;
-        PossibleMoves = new bool[Board.MaxChessBoardSize, Board.MaxChessBoardSize];
+        _possibleMoves = new bool[Board.MaxChessBoardSize, Board.MaxChessBoardSize];
     }
 
 
@@ -35,13 +51,10 @@ public abstract class Piece
     /// <summary>
     /// PIECE POSITION METHODS
     /// </summary>
-
     public bool IsCurrentlyAtCoordinates(int row, int col)
     {
         return PiecePosition.Row == row && PiecePosition.Column == col;
     }
-    
-
     public void SetPiecePosition(Position position)
     {
         PiecePosition = position;
@@ -55,47 +68,48 @@ public abstract class Piece
     /// <summary>
     /// PIECE MOVEMENTS
     /// </summary>
-    public bool PositionIsInPossibleMoves(Position pos)
-    {
-        return CoordinatesIsInPossibleMoves(pos.Row, pos.Column);
-    }
-
-    public bool HasAtLeastOnePossibleMove()
-    {
-        for (var i = 0; i < PossibleMoves.GetLength(0) - 1; i++)
-        {
-            for (var j = 0; j < PossibleMoves.GetLength(1) -1 ; j++)
-            {
-                if (PossibleMoves[i, j])
-                    return true;
-            }
-        }
-
-        return false;
-    }
-    public bool[,] GetAllPossibleMoves()
-    {
-        return PossibleMoves;
-    }
-    public bool CoordinatesIsInPossibleMoves(int row,int col)
-    {
-        return PossibleMoves[row, col];
-    }
     public void IncreaseTimesMoved()
     {
         TimesMoved++;
     }
-    public abstract void CalculatePossibleMoves();
     protected void ClearPossibleMoves()
     {
         for (int i = 0; i < Board.MaxChessBoardSize; i++)
         {
             for (int j = 0; j < Board.MaxChessBoardSize; j++)
             {
-                PossibleMoves[i, j] = false;
+                _possibleMoves[i, j] = false;
             }
         }
     } 
+    public bool[,] GetAllPossibleMoves()
+    {
+        return _possibleMoves;
+    }
+    public bool HasAtLeastOnePossibleMove()
+    {
+        for (var i = 0; i < _possibleMoves.GetLength(0) - 1; i++)
+        {
+            for (var j = 0; j < _possibleMoves.GetLength(1) -1 ; j++)
+            {
+                if (_possibleMoves[i, j])
+                    return true;
+            }
+        }
+
+        return false;
+    }
+    public bool PositionIsInPossibleMoves(Position pos)
+    {
+        return CoordinatesIsInPossibleMoves(pos.Row, pos.Column);
+    }
+    private bool CoordinatesIsInPossibleMoves(int row,int col)
+    {
+        return _possibleMoves[row, col];
+    }
+    
+    public abstract void AfterMoveVerification();
+    public abstract void CalculatePossibleMoves();
     protected void CheckPossibleMovesInDirection(HorizontalDirections hDirection, VerticalDirections vDirection,int maxDistantMovesToCheck = 99 , MovementType hasToBeOfMovementType = MovementType.Any)
     {
         var countHelper = 0;
@@ -163,14 +177,14 @@ public abstract class Piece
         if (piece == null)
             return MovementType.Move;
         
-        if (piece.GetPieceColor() == _pieceColor)
+        if (piece.GetPieceColor() == PieceColor)
             return MovementType.IllegalMove;
         
         return piece.GetPieceType() == PieceType.King ? MovementType.Check : MovementType.Take;
     }
     private void SetPositionAsPossibleMove(Position pos)
     {
-        PossibleMoves[pos.Row,pos.Column] = true;
+        _possibleMoves[pos.Row,pos.Column] = true;
     }
     
     
@@ -194,7 +208,7 @@ public abstract class Piece
     /// <returns></returns>
     public PieceColor GetPieceColor()
     {
-        return _pieceColor;
+        return PieceColor;
     }
 
     /// <summary>
@@ -209,6 +223,6 @@ public abstract class Piece
     
     public override string ToString()
     {
-        return $" {_pieceColor.ToString()} {Name} ";
+        return $" {PieceColor.ToString()} {_name} ";
     }
 }

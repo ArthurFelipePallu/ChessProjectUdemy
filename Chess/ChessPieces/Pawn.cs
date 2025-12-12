@@ -9,8 +9,8 @@ public class Pawn : Piece
     
     public Pawn(ChessBoard board, PieceColor pieceColor) : base(board, pieceColor)
     {
-        Value = 1;
-        Name = "Pawn";
+        _value = 1;
+        _name  = "Pawn";
         ChessNotation = 'P';
         PieceType = PieceType.Pawn;
     }
@@ -29,6 +29,8 @@ public class Pawn : Piece
         if(!hasPieceAhead)
             CheckPossibleMovesInDirection(HorizontalDirections.None,vDir,firstPawnMove);
         
+        
+        
         //Posição de Cima e Esquerda e precisa ser Movimento de Captura
         CheckPossibleMovesInDirection(HorizontalDirections.Left,vDir,1,MovementType.Take);
 
@@ -36,5 +38,8 @@ public class Pawn : Piece
         CheckPossibleMovesInDirection(HorizontalDirections.Right,vDir,1,MovementType.Take);
     }
 
-
+    public override void AfterMoveVerification()
+    {
+        throw new NotImplementedException();
+    }
 }

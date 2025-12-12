@@ -8,11 +8,17 @@ public class Knight : Piece
     
     public Knight(ChessBoard board, PieceColor pieceColor) : base(board, pieceColor)
     {
-        Value = 3;
-        Name = "Knight";
+        _value = 3;
+        _name = "Knight";
         ChessNotation = 'N';
         PieceType = PieceType.Knight;
     }
+
+    public override void AfterMoveVerification()
+    {
+        throw new NotImplementedException();
+    }
+
     public override void CalculatePossibleMoves()
     {
         ClearPossibleMoves();
