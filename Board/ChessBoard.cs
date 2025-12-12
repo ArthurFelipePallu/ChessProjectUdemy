@@ -6,34 +6,29 @@ namespace Chess_Console_Project.Board;
 
 public class ChessBoard
 {
+    private Piece[,] Board { get; }
+    private HashSet<Piece> _inPlayPieces;
+    private HashSet<Piece> _capturedPieces;
     public int MaxChessBoardSize { get; } = 8;
 
-    private Piece[,] Board { get; }
+    
 
     public ChessBoard()
     {
+        _inPlayPieces = new HashSet<Piece>();
+        _capturedPieces = new HashSet<Piece>();
         Board = new Piece[MaxChessBoardSize, MaxChessBoardSize];
-
     }
     
     /// <summary>
     /// ADD PIECE TO BOARD METHODS
     /// </summary>
-    public void AddWhitePieceOfTypeAtPosition(PieceType pieceType, Position position)
-    {
-        ValidateNewPiecePositionNotTaken(position);
-        AddPieceOfTypeAndColorAtPosition(pieceType,PieceColor.White,position);
-    }
-    public void AddBlackPieceOfTypeAtPosition(PieceType pieceType, Position position)
-    {
-        ValidateNewPiecePositionNotTaken(position);
-        AddPieceOfTypeAndColorAtPosition(pieceType,PieceColor.Black,position);
-    }
-    private void AddPieceOfTypeAndColorAtPosition(PieceType pieceType,PieceColor color, Position position) 
+
+    private Piece CreatePieceOfTypeAndColorAtPosition(PieceType pieceType,PieceColor color, Position position) 
     {
         var piece = CreateNewPieceOfTypeAndColorAtPosition(pieceType,color,position);
         piece.SetPiecePosition(position);
-        Board[position.Row, position.Column] = piece;
+        return piece;
     }
     private Piece CreateNewPieceOfTypeAndColorAtPosition(PieceType pieceType,PieceColor pieceColor,Position position)
     {
@@ -55,10 +50,19 @@ public class ChessBoard
         throw new BoardException("[CHESS BOARD] Invalid piece type");
     }
 
+    public void AddPlayingPiece(PieceColor pieceColor , PieceType pieceType,char column,int row)
+    {
+        var notationPosition = new ChessNotationPosition(row, column);
+        var pos = notationPosition.ToPosition();
+        ValidateNewPiecePositionNotTaken(notationPosition.ToPosition());
+        var piece = CreatePieceOfTypeAndColorAtPosition(pieceType,pieceColor,pos);
+        _inPlayPieces.Add(piece);
+        Board[pos.Row, pos.Column] = piece;
+    }
 
-    
-    
-    
+
+
+
     /// <summary>
     /// REMOVE PIECE METHODS
     /// </summary>
@@ -78,6 +82,13 @@ public class ChessBoard
         return removedPiece;
     }
 
+    public void RemovePieceFromPlay(Piece piece)
+    {
+        _inPlayPieces.Remove(piece);
+        _capturedPieces.Add(piece);
+    }
+    
+    
 
     /// <summary>
     /// PUT PIECES METHOD

@@ -9,24 +9,28 @@ public struct ChessNotationPosition
     private int _row;  // 1 - 8
     private char _col;// A - H
 
+    public int Row { get => _row; set => _row = value; }
+    public char Col { get => _col; set => _col = char.ToUpper(value); }
+    public int ColAsInt => (int)_col;
     public ChessNotationPosition(int row, char col) 
     {
         ValidateRow(row);
         ValidateColumn(col);
     }
 
+
     private void ValidateRow(int row)
     {
         if(row is < 1 or > MaxChessBoardSize)
-            throw new ChessException($"[CHESS NOTRIFICATION POSITION] Row {row} is out of range [1 - 8] ");
-        this._row = row;
+            throw new ChessException($"[CHESS NOTIFICATION POSITION] Row {row} is out of range [1 - 8] ");
+        Row = row;
     }
     private void ValidateColumn(char col)
     {
         col = char.ToUpper(col);
         if(col is < 'A' or > 'H')
             throw new ChessException($"[CHESS NOTRIFICATION POSITION] Column {col} is out of range [a - h] ");
-        this._col = col;
+        Col = col;
     }
 
     public Position ToPosition()

@@ -153,11 +153,22 @@ public abstract class Piece
                 keepGoing = false;
         }
     }
-    protected MovementType TryPositionPossibleMove(Position pos)
+    protected MovementType TryPositionPossibleMove(Position pos,params MovementType[] extraRestrictions)
     {
         var move = CheckMovementTypeAt(pos);
-        if(move != MovementType.IllegalMove)
-            SetPositionAsPossibleMove(pos);
+        if (move != MovementType.IllegalMove)
+        {
+            
+            if(extraRestrictions == null)
+            {
+                SetPositionAsPossibleMove(pos);
+                return move;
+            }
+            else if (!extraRestrictions.Contains(move))
+            {
+                SetPositionAsPossibleMove(pos);
+            }
+        }
 
         return move;
     }

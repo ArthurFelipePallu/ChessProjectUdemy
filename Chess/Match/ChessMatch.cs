@@ -166,7 +166,6 @@ public class ChessMatch
         if (piece.GetPieceColor() != _toPlay)
             throw new MovementException($"[ CHESS MATCH ] Piece at position {pos.ToString()} does not belong to player {_toPlay.ToString()}");
     }
-
     private void DestinationPositionCanBeMovedToOrTaken(Position destination)
     {
         //Verify if destination position has piece
@@ -182,7 +181,6 @@ public class ChessMatch
             throw new MovementException($"[ CHESS MATCH ] Piece at destination {destination.ToString()} belongs to player {_toPlay.ToString()}, it can not be taken.");
 
     }
-
     private string MovePieceFromTo(Position origin, Position destination)
     {
         var originPiece = _chessBoard.RemovePieceFromBoardAt(origin);
@@ -196,9 +194,6 @@ public class ChessMatch
             : $"[ CHESS MATCH ] Piece [{originPiece}] took [{destinationPiece}] at destination [{destination}]";
 
     }
-    
-    
-    
     private void ChangePlayerToMove()
     {
         _toPlay = _toPlay == PieceColor.White ? PieceColor.Black : PieceColor.White;
