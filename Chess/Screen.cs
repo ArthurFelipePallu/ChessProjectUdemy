@@ -43,7 +43,6 @@ public class Screen
     }
     public void PrintBoardWithPiecePossibleMovements(ChessBoard board,bool[,] possibleMoves)
     {
-        ClearScreen();
         PrintBoardExtension(board,possibleMoves);
     }
     private  void PrintBoardExtension( ChessBoard board)
