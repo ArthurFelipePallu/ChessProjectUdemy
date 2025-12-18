@@ -26,12 +26,12 @@ public static class BoardExtensions
     private static void CreateBlackPiecesInitialPosition(this ChessBoard board)
     {
         board.AddPlayingPiece(PieceColor.Black,PieceType.Rook,'a',8);
-        board.AddPlayingPiece(PieceColor.Black,PieceType.Knight,'b',8);
-        board.AddPlayingPiece(PieceColor.Black,PieceType.Bishop,'c',8);
-        board.AddPlayingPiece(PieceColor.Black,PieceType.Queen,'d',8);
+        //board.AddPlayingPiece(PieceColor.Black,PieceType.Knight,'b',8);
+        //board.AddPlayingPiece(PieceColor.Black,PieceType.Bishop,'c',8);
+        //board.AddPlayingPiece(PieceColor.Black,PieceType.Queen,'d',8);
         board.AddPlayingPiece(PieceColor.Black,PieceType.King,'e',8);
-        board.AddPlayingPiece(PieceColor.Black,PieceType.Bishop,'f',8);
-        board.AddPlayingPiece(PieceColor.Black,PieceType.Knight,'g',8);
+        //board.AddPlayingPiece(PieceColor.Black,PieceType.Bishop,'f',8);
+        //board.AddPlayingPiece(PieceColor.Black,PieceType.Knight,'g',8);
         board.AddPlayingPiece(PieceColor.Black,PieceType.Rook,'h',8);
 
         for (var i = 0; i < board.MaxChessBoardSize; i++)
@@ -44,12 +44,12 @@ public static class BoardExtensions
     private static void CreateWhitePiecesInitialPosition(this ChessBoard board)
     {
         board.AddPlayingPiece(PieceColor.White,PieceType.Rook,'a',1);
-        board.AddPlayingPiece(PieceColor.White,PieceType.Knight,'b',1);
-        board.AddPlayingPiece(PieceColor.White,PieceType.Bishop,'c',1);
-        board.AddPlayingPiece(PieceColor.White,PieceType.Queen,'d',1);
+       // board.AddPlayingPiece(PieceColor.White,PieceType.Knight,'b',1);
+       //board.AddPlayingPiece(PieceColor.White,PieceType.Bishop,'c',1);
+       //board.AddPlayingPiece(PieceColor.White,PieceType.Queen,'d',1);
         board.AddPlayingPiece(PieceColor.White,PieceType.King,'e',1);
-        board.AddPlayingPiece(PieceColor.White,PieceType.Bishop,'f',1);
-        board.AddPlayingPiece(PieceColor.White,PieceType.Knight,'g',1);
+        //board.AddPlayingPiece(PieceColor.White,PieceType.Bishop,'f',1);
+        //board.AddPlayingPiece(PieceColor.White,PieceType.Knight,'g',1);
         board.AddPlayingPiece(PieceColor.White,PieceType.Rook,'h',1);
 
         for (var i = 0; i < board.MaxChessBoardSize; i++)

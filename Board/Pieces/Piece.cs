@@ -24,11 +24,11 @@ public abstract class Piece
     protected readonly PieceColor PieceColor;
     protected Position PiecePosition;
     protected readonly ChessBoard Board;
-    protected int TimesMoved {get; private set;}
     
     /// <summary>
     /// PUBLIC
     /// </summary>
+    public int TimesMoved {get; private set;}
    
     
     
@@ -222,17 +222,6 @@ public abstract class Piece
                 Console.WriteLine($"Was Checking for EnemyPiece { piecesToBeAwareOf[0].ToString()}");
                 return false;
             }
-
-
-            // if (PossibleMoveAtPositionIsOfAllowedTypes(possiblePosition, MovementType.AllyPiece))
-            // {
-            //     keepGoing = false;
-            //     break;
-            // }
-            // if (IsPieceAtPositionIsAnEnemyOfType(possiblePosition, piecesToBeAwareOf))
-            //     return true;
-
-            
             var move = CheckMovementTypeAt(possiblePosition);
             switch (move)
             {
@@ -261,6 +250,44 @@ public abstract class Piece
 
         return false;
     }
+
+    protected Piece GetFirstPieceInDirection(HorizontalDirections hDirection, VerticalDirections vDirection)
+    {
+        var countHelper = 0;
+        var keepGoing = true;
+
+        var possibleMovePosX = 0;
+        var possibleMovePosY = 0;
+        var maxDistantMovesToCheck = 8;
+
+        var possiblePosition = new Position(possibleMovePosX, possibleMovePosY);
+        while (keepGoing)
+        {
+            countHelper++;
+            possibleMovePosX = PiecePosition.Row + (countHelper * (int)vDirection);
+            possibleMovePosY = PiecePosition.Column + (countHelper * (int)hDirection);
+            try
+            {
+                possiblePosition.SetPosition(possibleMovePosX, possibleMovePosY);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Was Checking for Piece but went out of bounds");
+                return null;
+            }
+
+            var piece = Board.AccessPieceAtPosition(possiblePosition);
+            if (piece != null)
+                return piece;
+            
+            if(countHelper >= maxDistantMovesToCheck)
+                keepGoing = false;
+        }
+
+        return null;
+    }
+    
+    
     protected bool PossibleMoveAtPositionIsLegalAndNotOfNotSpecifiedTypes(Position pos,params MovementType[] notAllowedMovementTypes)
     {
         var move = CheckMovementTypeAt(pos);

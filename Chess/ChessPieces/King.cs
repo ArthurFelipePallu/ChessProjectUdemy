@@ -20,31 +20,35 @@ public class King : Piece
         ClearPossibleMoves();
 
         Board.UpdateAllTargetedSquaresInBoardWithAdversaryTargets(PieceColor);
-
+        
+        if(CanShortCastle())
+            SetShortCastlePossiblePosition();
+        if(CanLongCastle())
+            SetLongCastlePossiblePosition();
         
         //Posição de Cima
-        CheckPossibleMoveIsNotCheck(VerticalDirections.Up,HorizontalDirections.None);
+         CheckPossibleMoveIsNotCheck(VerticalDirections.Up,HorizontalDirections.None);
         
-        //Posição de Cima e Esquerda
-        CheckPossibleMoveIsNotCheck(VerticalDirections.Up,HorizontalDirections.Left);
+         //Posição de Cima e Esquerda
+         CheckPossibleMoveIsNotCheck(VerticalDirections.Up,HorizontalDirections.Left);
         
-        //Posição de Cima e Direita
-        CheckPossibleMoveIsNotCheck(VerticalDirections.Up,HorizontalDirections.Right);
+         //Posição de Cima e Direita
+         CheckPossibleMoveIsNotCheck(VerticalDirections.Up,HorizontalDirections.Right);
         
-        //Posição Esquerda
+         //Posição Esquerda
         CheckPossibleMoveIsNotCheck(VerticalDirections.None,HorizontalDirections.Left);
         
         //Posição Direita
         CheckPossibleMoveIsNotCheck(VerticalDirections.None,HorizontalDirections.Right);
         
-        //Posição de Baixo
-        CheckPossibleMoveIsNotCheck(VerticalDirections.Down,HorizontalDirections.None);
+         //Posição de Baixo
+         CheckPossibleMoveIsNotCheck(VerticalDirections.Down,HorizontalDirections.None);
         
-        //Posição de Baixo e Esquerda
-        CheckPossibleMoveIsNotCheck(VerticalDirections.Down,HorizontalDirections.Left);
+         //Posição de Baixo e Esquerda
+         CheckPossibleMoveIsNotCheck(VerticalDirections.Down,HorizontalDirections.Left);
         
-        //Posição de Baixo e Direita
-        CheckPossibleMoveIsNotCheck(VerticalDirections.Down,HorizontalDirections.Right);
+         //Posição de Baixo e Direita
+         CheckPossibleMoveIsNotCheck(VerticalDirections.Down,HorizontalDirections.Right);
     }
 
     public override void CalculatePossibleAttackMoves()
@@ -89,8 +93,15 @@ public class King : Piece
         if (!PossibleMovementAtPositionIsMoveOrTake((int)vDir, (int)hDir)) return;
         //var kingOriginalPos = PiecePosition;
 
-        if(Board.IsSquareInCoordinatesTargetedByOpponent(PiecePosition.Row + (int)vDir, PiecePosition.Column + (int)hDir))
-            SetPositionAsNotPossibleMove(new Position(PiecePosition.Row + (int)vDir, PiecePosition.Column + (int)hDir));
+
+        var auxPosition = new Position(PiecePosition.Row + (int)vDir, PiecePosition.Column + (int)hDir);
+
+        if(Board.IsSquareInCoordinatesTargetedByOpponent(auxPosition.Row , auxPosition.Column ))
+        {
+            SetPositionAsNotPossibleMove(auxPosition);
+        }
+        else
+            SetPositionAsPossibleMove(auxPosition);
 
         // try
         // { 
@@ -166,7 +177,49 @@ public class King : Piece
                 PositionIsEnemyPieceOfType((int)vDir , -1,PieceType.Pawn);
     }
 
+
+    private bool CanShortCastle()
+    {
+        return CanCastle(PieceColor == PieceColor.White ? HorizontalDirections.Left : HorizontalDirections.Right);
+    }
+    private bool CanLongCastle()
+    {
+        return CanCastle(PieceColor == PieceColor.White ? HorizontalDirections.Right : HorizontalDirections.Left);
+    }
+    private bool CanCastle(HorizontalDirections hDir)
+    {
+        if (TimesMoved > 0) return false;
+
+        if (Board.IsSquareInCoordinatesTargetedByOpponent(PiecePosition.Row, PiecePosition.Column)) return false;
+
+        var piece = GetFirstPieceInDirection(hDir, VerticalDirections.None);
+        if (piece == null) return false;
+        if (piece.GetPieceType() != PieceType.Rook) return false;
+        if (piece.GetPieceColor() != PieceColor) return false;
+        if(piece.TimesMoved > 0) return false;
+        if (Board.IsSquareInCoordinatesTargetedByOpponent(PiecePosition.Row, PiecePosition.Column + (int)hDir)) return false;
+        if (Board.IsSquareInCoordinatesTargetedByOpponent(PiecePosition.Row, PiecePosition.Column + (int)hDir * 2 )) return false;
+
+
+        return true;
+    }
+
+
+    private void SetShortCastlePossiblePosition()
+    {
+        var hDir =  PieceColor == PieceColor.White ? HorizontalDirections.Left : HorizontalDirections.Right;
+        SetCastlePositionAsPossible(hDir);
+    }
+    private void SetLongCastlePossiblePosition()
+    {
+        var hDir =  PieceColor == PieceColor.White ? HorizontalDirections.Right : HorizontalDirections.Left;
+        SetCastlePositionAsPossible(hDir);
+    }
     
+    private void SetCastlePositionAsPossible(HorizontalDirections hDir)
+    {
+        SetPositionAsPossibleMove(new Position(PiecePosition.Row , PiecePosition.Column + (int)hDir * 2  ));
+    }
     
     public override void AfterMoveVerification()
     {
