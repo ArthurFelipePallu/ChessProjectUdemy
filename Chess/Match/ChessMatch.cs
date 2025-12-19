@@ -83,7 +83,6 @@ public class ChessMatch
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    throw;
                 }
                 _screen.ScreenWriteAndWaitForEnterToContinue($"{PlayerToMove().Name}'s turn is over ");
                 break;
@@ -149,7 +148,18 @@ public class ChessMatch
 
     private void ExecuteMovement(Piece piece, Position destination)
     {
-        var movementIsSuccessful = MovePieceTo(piece,destination,out var actionMessage);
+        var actionMessage = "";
+        var movementIsSuccessful = false;
+        
+        if (IsMovementCastles(piece, destination))
+        {
+            var castlesDir = GetCastleDirection(piece, destination);
+            movementIsSuccessful = MovePieceTo(piece,destination,out actionMessage);
+            MoveRookInCastles(piece,castlesDir);
+        }
+        else 
+            movementIsSuccessful = MovePieceTo(piece,destination,out actionMessage);
+
         
         PrintBoardAndPlayers();
         _screen.ScreenWriteAndWaitForEnterToContinue(actionMessage);
@@ -160,9 +170,31 @@ public class ChessMatch
             
         }
     }
+    private bool IsMovementCastles(Piece piece, Position destination)
+    {
+        if (piece.GetPieceType() != PieceType.King) return false;
+        var x = destination.Column - piece.GetPiecePosition().Column;
+        return Math.Abs(x) == 2;
+    }
+
+    private HorizontalDirections GetCastleDirection(Piece king, Position destination)
+    {
+        var x = destination.Column - king.GetPiecePosition().Column;
+        return x < 0 ? HorizontalDirections.Left : HorizontalDirections.Right;
+    }
+
+    private void MoveRookInCastles(Piece king , HorizontalDirections castlesDir)
+    {
+        var rookCol = castlesDir == HorizontalDirections.Left ? 'a' : 'h';
+        var rookOriginalChessNotationPosition = new ChessNotationPosition(king.GetPiecePosition().ToChessNotationPosition().Row , rookCol);
+        var rook = _chessBoard.AccessPieceAtChessNotationPosition(rookOriginalChessNotationPosition);
+        var rookDestinationPosition = new Position(king.GetPiecePosition().Row, king.GetPiecePosition().Column - (int)castlesDir );
+        MovePieceTo(rook,rookDestinationPosition,out var actionMessage);
+
+        _screen.ScreenWriteAndWaitForEnterToContinue(actionMessage);
+    }
     
 
- 
     private bool MovePieceTo(Piece piece, Position destination, out string message)
     {
         var originalPiecePosition = piece.GetPiecePosition();

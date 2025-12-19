@@ -48,6 +48,6 @@ public class Position
         //Subtraindo 1 para acessar
         //posições da matriz de 0 a 7
         
-        return new ChessNotationPosition( int.Abs(Row -MaxChessBoardSize) + 1,(char)(Column + 65) );
+        return new ChessNotationPosition( int.Abs(Row -MaxChessBoardSize) ,(char)(Column + 65) );
     }
 }
