@@ -20,26 +20,58 @@ public class Pawn : Piece
 
         var firstPawnMove = TimesMoved == 0 ? 2 : 1;
 
-        var vDir = GetPieceColor() == PieceColor.White ? VerticalDirections.Up : VerticalDirections.Down;
+        var vDir = GetPawnDirectionInBoardByColor();
         
         for (var i = 1; i <= firstPawnMove; i++)
         {
-            // var hasPieceAhead = Board.HasPieceAtCoordinate(PiecePosition.Row + ((int)vDir * i), PiecePosition.Column);
-            // if (!hasPieceAhead)
-            // {
+            
             var pos = new Position(PiecePosition.Row + ((int)vDir * i), PiecePosition.Column);
             if (PossibleMoveAtPositionIsOfAllowedTypes(pos,MovementType.Move))
                 SetPositionAsPossibleMove(pos);
-            // }
-            // else break;
+            
         }
         
+        VerifyEnPassantMovementIsPossibleInDirection(HorizontalDirections.Left);
+        
+        VerifyEnPassantMovementIsPossibleInDirection(HorizontalDirections.Right);
+        
+        Board.PrintPiecePossibleMoves(this);
     }
+
+
+    private void VerifyEnPassantMovementIsPossibleInDirection(HorizontalDirections hDir)
+    {
+        //is in 5th rank
+        if(!PawnIsIn5thRank()) return;
+        //has opponent pawn by its side
+        var enemyPawn  = Board.AccessPieceAtCoordinates(PiecePosition.Row, PiecePosition.Column + (int)hDir);
+        if (enemyPawn == null) return;
+
+        //opponentspawn moved only once
+        if(enemyPawn.TimesMoved > 1) return;
+        //opponents pawn was last piece moved
+        if (Board.LastMovedPiece != enemyPawn) return;
+
+        var vDir = GetPawnDirectionInBoardByColor();
+        SetPositionAsPossibleMove(new Position(PiecePosition.Row + (int)vDir, PiecePosition.Column + (int)hDir));
+    }
+
+    private bool PawnIsIn5thRank()
+    {
+        var isPawnWhite = PieceColor == PieceColor.White;
+        if (isPawnWhite)
+        {
+            return PiecePosition.Row == 3;
+        }
+        return PiecePosition.Row == 4;
+    }
+    
+    
 
     public override void CalculatePossibleAttackMoves()
     {
         ClearPossibleMoves();
-        var vDir = GetPieceColor() == PieceColor.White ? VerticalDirections.Up : VerticalDirections.Down;
+        var vDir = GetPawnDirectionInBoardByColor();
         //Posição de Cima e Esquerda e precisa ser Movimento de Captura
         PossibleMovementAtPositionWithModifiersIsOfMoveType((int)vDir, (int)HorizontalDirections.Left,MovementType.TakeEnemyPiece);
         
@@ -66,5 +98,10 @@ public class Pawn : Piece
         {
             return;
         }
+    }
+
+    private VerticalDirections GetPawnDirectionInBoardByColor()
+    {
+        return GetPieceColor() == PieceColor.White ? VerticalDirections.Up : VerticalDirections.Down;
     }
 }
