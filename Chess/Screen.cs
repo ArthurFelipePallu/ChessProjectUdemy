@@ -12,6 +12,10 @@ public class Screen
     private ConsoleColor _currentForeGroundColor = ConsoleColor.White;
     
     
+    private const  ConsoleColor PlayingPlayerColor = ConsoleColor.White;
+    private const  ConsoleColor NotPlayingPlayerColor = ConsoleColor.DarkGray;
+    
+    
     /// <summary>
     /// BOARD COLORS
     /// </summary>
@@ -32,22 +36,33 @@ public class Screen
         Console.OutputEncoding = System.Text.Encoding.UTF8;
     }
     
-    public void PrintBoardAndPlayers(ChessPlayer playerWhite, ChessPlayer playerBlack , ChessBoard chessBoard)
+    public void PrintBoardAndPlayers(ChessPlayer playerWhite, ChessPlayer playerBlack , ChessBoard chessBoard,PieceColor playingColor)
     {
         ClearScreen();
-        PrintPlayerDetailedInformation(playerBlack, chessBoard.GetCapturedPieces(PieceColor.White));
+        PrintPlayerDetailedInformation(playerBlack, chessBoard.GetCapturedPieces(PieceColor.White),GetPlayingForegroundColor(playerBlack,playingColor));
+        SkipLine();
         PrintBoard(chessBoard);
-        PrintPlayerDetailedInformation(playerWhite, chessBoard.GetCapturedPieces(PieceColor.Black));
+        SkipLine();
+        PrintPlayerDetailedInformation(playerWhite, chessBoard.GetCapturedPieces(PieceColor.Black),GetPlayingForegroundColor(playerWhite,playingColor));
+        SkipLine();
     }
 
-    public void PrintBoardWithPiecePossibleMovesAndPlayers(Piece piece,ChessPlayer playerWhite, ChessPlayer playerBlack , ChessBoard chessBoard)
-    {
-        Screen.ClearScreen();
-        PrintPlayerDetailedInformation(playerBlack, chessBoard.GetCapturedPieces(PieceColor.White));
+    public void PrintBoardWithPiecePossibleMovesAndPlayers(Piece piece,ChessPlayer playerWhite, ChessPlayer playerBlack , ChessBoard chessBoard,PieceColor playingColor)
+    { 
+        ClearScreen();
+        PrintPlayerDetailedInformation(playerBlack, chessBoard.GetCapturedPieces(PieceColor.White),GetPlayingForegroundColor(playerBlack,playingColor));
+        SkipLine();
         PrintBoardWithPiecePossibleMovements(chessBoard,piece.GetAllPossibleMoves());
-        PrintPlayerDetailedInformation(playerWhite, chessBoard.GetCapturedPieces(PieceColor.Black));
+        SkipLine();
+        PrintPlayerDetailedInformation(playerWhite, chessBoard.GetCapturedPieces(PieceColor.Black),GetPlayingForegroundColor(playerWhite,playingColor));
+        SkipLine();
     }
-    
+
+
+    private ConsoleColor GetPlayingForegroundColor(ChessPlayer player , PieceColor playingColor)
+    {
+        return player.PlayingColor == playingColor ? PlayingPlayerColor : NotPlayingPlayerColor;
+    }
     
      
     /// <summary>
@@ -178,8 +193,9 @@ public class Screen
     /// </summary>
 
 
-    private void PrintPlayerDetailedInformation(ChessPlayer player, HashSet<Piece> capturedPieces)
+    private void PrintPlayerDetailedInformation(ChessPlayer player, HashSet<Piece> capturedPieces,ConsoleColor color)
     {
+        Console.ForegroundColor = color;
         Console.WriteLine($"{_emptySquare} {player.Name}  ELO: {player.Elo}");
         Console.WriteLine($"{_emptySquare} Playing with {player.PlayingColor.ToString()}");
 
@@ -203,7 +219,7 @@ public class Screen
     private ChessNotationPosition GetChessNotationPosition()
     {
 
-        ScreenWrite($"Specify a Column [a - h] or [A - H] followed by a Row [1 - 8]. {Environment.NewLine} EX : 'A2' or 'a2'    ");
+        ScreenWrite($"Specify a Column [a - h] followed by a Row [1 - 8]. {Environment.NewLine} EX : 'a2' ");
         var notation =  Console.ReadLine();
 
         if (notation == null || notation.Length != 2) throw new ChessException("[ CHESS MATCH] Notation specified by player is in wrong format");
@@ -255,7 +271,10 @@ public class Screen
         _currentForeGroundColor = color;
         Console.ForegroundColor = color;
     }
-
+    private void SkipLine()
+    {
+        Console.WriteLine();
+    }
 
     
 
@@ -273,6 +292,21 @@ public class Screen
         Console.WriteLine("-+#########-..#########..####-..###...####+##.#####..##.####+..########+#.");
         Console.WriteLine(".+###########...-+..###..####...###...#-...##...+#..###...#+..#########+#.");
         Console.WriteLine("-+#################################################################+#####.");
+    }
+
+    public void PrintCrown()
+    {
+        Console.WriteLine("⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⡀ ⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀   ");
+        Console.WriteLine("⠀⣠⣄⠀⠀⠀⠀⠀⠀⣏⢉⡆⠀⠀⠀⠀⢰⡋⢹⡄⠀⠀⠀⠀⠀⣠⣤⡀ ");
+        Console.WriteLine("⠸⣄⣼⡀⠀⠀⠀⠀⠀⢈⡿⡄⠀⠀⠀⠀⢠⠿⡁⠀⠀⠀⠀⠀⠀⣧⣠⠇ ");
+        Console.WriteLine("⠀⠀⢸⡉⠢⣄⠀⠀⠀⡼⠀⠘⢦⠀⠀⡰⠃⠀⢧⠀⠀⠀⣠⠔⠋⡇⠀⠀ ");
+        Console.WriteLine("⠀⠀⠀⣇⠀⠈⠑⠒⠒⠁⠀⠀⠀⠑⠊⠁⠀⠀⠈⠒⠒⠊⠁⠀⢸⠀⠀⠀ ");
+        Console.WriteLine("⠀⠀⠀⢹⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ ⡏⠀⠀⠀ ");
+        Console.WriteLine("⠀⠀⠀⠀⣓⠤⠤⣄⣀⣀⣀⣀⣀⠀⠀⢀⣀⣀⣀⣀⣀⡤⢤⣾⠅⠀⠀⠀");
+        Console.WriteLine("⠀⠀⠀⠀⣏⢭⡙⢒⡒⠒⠒⠛⠛⢻⡛⠛⠛⠒⠒⢒⡒⠋⡭⣽⡇⠀⠀⠀");
+        Console.WriteLine("⠀⠀⠀⠀⣏⡚⠁⠧⠜⠰⣍⠇⠰⣁⣈⠆⠸⣭⠇⠳⠼⠀⢓⣹⠇⠀⠀⠀");
+        Console.WriteLine("⠀⠀⠀⠀⠓⠮⠭⠭⣟⣒⣒⣒⣒⣚⣓⣒⣒⣒⣒⣚⠭⠭⠵⠚⠀⠀⠀⠀");
+        SkipLine();
     }
     
 }

@@ -52,6 +52,8 @@ public static class BoardExtensions
         board.AddPlayingPiece(PieceColor.White,PieceType.Rook,'h',1);
 
         
+        board.AddPlayingPiece(PieceColor.White,PieceType.Bishop,'c',4);
+        board.AddPlayingPiece(PieceColor.White,PieceType.Queen,'f',3);
         
         for (var i = 0; i < board.MaxChessBoardSize; i++)
         {

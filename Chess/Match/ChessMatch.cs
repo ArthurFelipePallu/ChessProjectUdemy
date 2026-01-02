@@ -54,22 +54,20 @@ public class ChessMatch
             case MatchStatus.Playing:
                 try
                 {
-                    if (IsKingOfColorInCheckMate(_toPlay))
-                    {
-                        _screen.ScreenWriteAndWaitForEnterToContinue($"Player {GetPlayingPlayer().Name} received a checkmate");
-                        _matchStatus = MatchStatus.Finished;
-                        break;
-                    }
-                    
-                    
-                    _screen.PrintBoardAndPlayers(_playerWhite,_playerBlack,_chessBoard);
-                    _screen.AnnouncePlayerToMove(PlayerToMove());
+                   _screen.PrintBoardAndPlayers(_playerWhite,_playerBlack,_chessBoard,_toPlay);
+                    _screen.AnnouncePlayerToMove(GetPlayingPlayer());
 
                     var originChessNotationPositionPosition = _screen.AskPlayerForPieceInBoard();
                     var piece = _chessBoard.AccessPieceAtChessNotationPosition(originChessNotationPositionPosition);
+                    
                     if (piece == null)
                     {
                         _screen.ScreenWriteAndWaitForEnterToContinue($"No piece at {originChessNotationPositionPosition}");
+                        break;
+                    }
+                    if (piece.GetPieceColor() != _toPlay)
+                    {
+                        _screen.ScreenWriteAndWaitForEnterToContinue($"Piece {piece} does not belong to {_toPlay} player");
                         break;
                     }
                     piece.CalculatePossibleMoves();
@@ -80,7 +78,7 @@ public class ChessMatch
                         _screen.ScreenWriteAndWaitForEnterToContinue($"The Selected {piece} has no legal moves , please select another piece");
                         break;
                     }
-                    _screen.PrintBoardWithPiecePossibleMovesAndPlayers(piece,_playerWhite,_playerBlack,_chessBoard);
+                    _screen.PrintBoardWithPiecePossibleMovesAndPlayers(piece,_playerWhite,_playerBlack,_chessBoard,_toPlay);
 
                     var destinationChessNotationPosition = _screen.AskPlayerForPieceDestinationInBoard(piece);
                     
@@ -95,10 +93,16 @@ public class ChessMatch
                 {
                     Console.WriteLine(e);
                 }
-                _screen.ScreenWriteAndWaitForEnterToContinue($"{PlayerToMove().Name}'s turn is over ");
+                if (IsKingOfColorInCheckMate(_toPlay))
+                {
+                    _screen.PrintBoardAndPlayers(_playerWhite,_playerBlack,_chessBoard,_toPlay);
+                    _screen.ScreenWriteAndWaitForEnterToContinue($"Player {GetPlayingPlayer().Name} received a checkmate");
+                    _matchStatus = MatchStatus.Finished;
+                }
                 break;
             case MatchStatus.Finished:
-                _screen.ScreenWriteAndWaitForEnterToContinue($"Player{GetNotPlayingPlayer().Name} won the match");
+                _screen.PrintCrown();
+                _screen.ScreenWriteAndWaitForEnterToContinue($"Player {GetNotPlayingPlayer().Name} won the match");
                 _matchStatus = MatchStatus.ExitingGame;
                 break;
             case MatchStatus.ExitingGame:
@@ -137,14 +141,14 @@ public class ChessMatch
 
 
 
+    
     /// <summary>
-    /// MOVEMENT METHODS
+    ///   MOVEMENT METHODS
     /// </summary>
     private void IncreaseTurnCount()
     {
         _movesCount++;
     }
-
     private void ExecuteMovement(Piece piece, Position destination)
     {
         var actionMessage = "";
@@ -167,7 +171,7 @@ public class ChessMatch
         else 
             movementIsSuccessful = MovePieceTo(piece,destination,out actionMessage);
 
-        _screen.PrintBoardAndPlayers(_playerWhite,_playerBlack,_chessBoard);
+        _screen.PrintBoardAndPlayers(_playerWhite,_playerBlack,_chessBoard,_toPlay);
         _chessBoard.SetLastMovedPiece(piece);
         _screen.ScreenWriteAndWaitForEnterToContinue(actionMessage);
         
@@ -179,37 +183,6 @@ public class ChessMatch
             
         }
     }
-    private bool IsMovementCastles(Piece piece, Position destination)
-    {
-        if (piece.GetPieceType() != PieceType.King) return false;
-        var x = destination.Column - piece.GetPiecePosition().Column;
-        return Math.Abs(x) == 2;
-    }
-    private bool IsMovementEnPassent(Piece piece, Position destination)
-    {
-        if (piece.GetPieceType() != PieceType.Pawn) return false;
-        if (piece.GetPiecePosition().Column == destination.Column) return false;
-        return _chessBoard.AccessPieceAtPosition(destination) == null;
-    }
-
-    private HorizontalDirections GetCastleDirection(Piece king, Position destination)
-    {
-        var x = destination.Column - king.GetPiecePosition().Column;
-        return x < 0 ? HorizontalDirections.Left : HorizontalDirections.Right;
-    }
-
-    private void MoveRookInCastles(Piece king , HorizontalDirections castlesDir)
-    {
-        var rookCol = castlesDir == HorizontalDirections.Left ? 'a' : 'h';
-        var rookOriginalChessNotationPosition = new ChessNotationPosition(king.GetPiecePosition().ToChessNotationPosition().Row , rookCol);
-        var rook = _chessBoard.AccessPieceAtChessNotationPosition(rookOriginalChessNotationPosition);
-        var rookDestinationPosition = new Position(king.GetPiecePosition().Row, king.GetPiecePosition().Column - (int)castlesDir );
-        MovePieceTo(rook,rookDestinationPosition,out var actionMessage);
-
-        _screen.ScreenWriteAndWaitForEnterToContinue(actionMessage);
-    }
-    
-
     private bool MovePieceTo(Piece piece, Position destination, out string message)
     {
         var originalPiecePosition = piece.GetPiecePosition();
@@ -242,24 +215,44 @@ public class ChessMatch
 
         return true;
     }
+    
+    /// <summary>
+    /// EN PASSENT
+    /// </summary>
+    private bool IsMovementEnPassent(Piece piece, Position destination)
+    {
+        if (piece.GetPieceType() != PieceType.Pawn) return false;
+        if (piece.GetPiecePosition().Column == destination.Column) return false;
+        return _chessBoard.AccessPieceAtPosition(destination) == null;
+    }
 
- 
-    private void ChangePlayerToMove()
+    /// <summary>
+    /// CASTLES
+    /// </summary>
+    private bool IsMovementCastles(Piece piece, Position destination)
     {
-        _toPlay = _toPlay == PieceColor.White ? PieceColor.Black : PieceColor.White;
-        
-        //If Player to move is white again , 1 turn has passed
-        if(_toPlay == PieceColor.White)
-            IncreaseTurnCount();
+        if (piece.GetPieceType() != PieceType.King) return false;
+        var x = destination.Column - piece.GetPiecePosition().Column;
+        return Math.Abs(x) == 2;
     }
-    private ChessPlayer GetPlayingPlayer()
+    private HorizontalDirections GetCastleDirection(Piece king, Position destination)
     {
-        return _toPlay == PieceColor.White ? _playerWhite : _playerBlack;
+        var x = destination.Column - king.GetPiecePosition().Column;
+        return x < 0 ? HorizontalDirections.Left : HorizontalDirections.Right;
     }
-    private ChessPlayer GetNotPlayingPlayer()
+    private void MoveRookInCastles(Piece king , HorizontalDirections castlesDir)
     {
-        return _toPlay == PieceColor.White ? _playerBlack : _playerWhite;
+        var rookCol = castlesDir == HorizontalDirections.Left ? 'a' : 'h';
+        var rookOriginalChessNotationPosition = new ChessNotationPosition(king.GetPiecePosition().ToChessNotationPosition().Row , rookCol);
+        var rook = _chessBoard.AccessPieceAtChessNotationPosition(rookOriginalChessNotationPosition);
+        var rookDestinationPosition = new Position(king.GetPiecePosition().Row, king.GetPiecePosition().Column - (int)castlesDir );
+        MovePieceTo(rook,rookDestinationPosition,out var actionMessage);
+
+        _screen.ScreenWriteAndWaitForEnterToContinue(actionMessage);
     }
+
+    
+    
     
 
     /// <summary>
@@ -294,11 +287,22 @@ public class ChessMatch
     {
         throw new ChessException($"[CHESS MATCH] AnotHer player already is playing as {player.PlayingAs()}");
     }
-    private ChessPlayer PlayerToMove()
+    private void ChangePlayerToMove()
+    {
+        _toPlay = _toPlay == PieceColor.White ? PieceColor.Black : PieceColor.White;
+        
+        //If Player to move is white again , 1 turn has passed
+        if(_toPlay == PieceColor.White)
+            IncreaseTurnCount();
+    }
+    private ChessPlayer GetPlayingPlayer()
     {
         return _toPlay == PieceColor.White ? _playerWhite : _playerBlack;
     }
-
+    private ChessPlayer GetNotPlayingPlayer()
+    {
+        return _toPlay == PieceColor.White ? _playerBlack : _playerWhite;
+    }
 
     private bool IsKingOfColorInCheck(PieceColor color)
     {
