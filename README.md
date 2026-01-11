@@ -87,15 +87,7 @@ The chessboard is displayed using ASCII characters with a clear coordinate syste
 - Pieces are represented by symbols/icons in their starting positions
 
 ### Example board layout:
-- 8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
-- 7 ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
-- 6  .  .  .  .  .  .  .  .
-- 5  .  .  .  .  .  .  .  .
-- 4  .  .  .  .  .  .  .  .
-- 3  .  .  .  .  .  .  .  .
-- 2 ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
-- 1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
--   A  B  C  D  E  F  G  H
+![Example board layout](Screenshots/initialBoard.png)
   
 - Top side (rank 8) belongs to Black
 - Bottom side (rank 1) belongs to White
