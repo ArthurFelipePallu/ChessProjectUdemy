@@ -62,13 +62,13 @@ cd ChessProjectUdemy
 ### 📦 Restore & Build
 
 Visual Studio
-Open the .sln file
-Press F5 to build and run
+- Open the .sln file
+- Press F5 to build and run
 
 .NET CLI
-dotnet restore
-dotnet build
-dotnet run --project "Chess Console Project.csproj"
+- dotnet restore
+- dotnet build
+- dotnet run --project "Chess Console Project.csproj"
 
 
 ----------------------------------------------------------------------------
