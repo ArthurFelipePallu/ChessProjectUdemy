@@ -97,8 +97,8 @@ The chessboard is displayed using ASCII characters with a clear coordinate syste
 Enter moves using algebraic board coordinates:
 
 <from> <to>
-  e2    e4
-→ Moves the Pawn from e2 to e4.
+-   e2  -> Selects the piece at e2
+-   e4  -> Moves the piece of e2 to e4
 
 ### 🔍 Piece Selection & Move Highlighting
 
