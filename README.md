@@ -105,6 +105,10 @@ Enter moves using algebraic board coordinates:
 When a player selects a piece, the game visually highlights all **valid moves**
 available for that piece directly on the board.
 
+![Example board layout](Screenshots/d2PawnChosen.png)
+![Example board layout](Screenshots/f6KnightChosen.png)
+![Example board layout](Screenshots/e8KingPossibleMoves.png)
+
 ### 🟥 Highlighted Squares
 - Highlighted squares indicate **legal destinations** for the selected piece
 - Only moves that follow **standard chess rules** are shown
