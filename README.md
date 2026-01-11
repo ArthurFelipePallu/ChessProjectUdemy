@@ -77,7 +77,7 @@ Visual Studio
 
 This is a two-player game at the terminal/console.
 
-## ♟️ Chessboard Overview
+### ♟️ Chessboard Overview
 
 The chessboard is displayed using ASCII characters with a clear coordinate system:
 
@@ -100,7 +100,7 @@ Enter moves using algebraic board coordinates:
   e2    e4
 → Moves the Pawn from e2 to e4.
 
-## 🔍 Piece Selection & Move Highlighting
+### 🔍 Piece Selection & Move Highlighting
 
 When a player selects a piece, the game visually highlights all **valid moves**
 available for that piece directly on the board.
