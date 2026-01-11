@@ -1,4 +1,4 @@
-# ChessProjectUdemy ♟️
+# Chess Game♟️
 
 A **console-based Chess application written in C#**, created to practice object-oriented programming, game logic, and C# fundamentals taught throughout a Udemy course.
 
