@@ -27,20 +27,20 @@ It’s designed to strengthen understanding of:
 
 ## 📁 Project Structure
 ChessProjectUdemy/
-├── Board/
-│ └── Board.cs # Chess board representation & draw logic
-├── Chess/
-│ ├── Piece.cs # Base class for chess pieces
-│ ├── Pawn.cs # Pawn logic
-│ ├── Rook.cs
-│ ├── Knight.cs
-│ ├── Bishop.cs
-│ ├── Queen.cs
-│ ├── King.cs
-│ └── MoveValidator.cs # Valid moves computation
-├── Program.cs # Entry point + game loop
-├── Chess Console Project.csproj # .NET project file
-├── ChessProjectUdemy.sln # Solution file
+- ├── Board/
+- │ └── Board.cs # Chess board representation & draw logic
+- ├── Chess/
+- │ ├── Piece.cs # Base class for chess pieces
+- │ ├── Pawn.cs # Pawn logic
+- │ ├── Rook.cs
+- │ ├── Knight.cs
+- │ ├── Bishop.cs
+- │ ├── Queen.cs
+- │ ├── King.cs
+- │ └── MoveValidator.cs # Valid moves computation
+- ├── Program.cs # Entry point + game loop
+- ├── Chess Console Project.csproj # .NET project file
+- ├── ChessProjectUdemy.sln # Solution file
 
 
 ----------------------------------------------------------------------------
@@ -89,15 +89,15 @@ Enter moves using algebraic board coordinates:
 
 ## 🧩 Features Implemented
 
-✔ Chess board display in console
-✔ Turn-based gameplay
-✔ Legal move validation for all pieces
-✔ Capture logic
-✔ Check and checkmate detection
-✔ En passant capture
-✔ Pawn promotion
-✔ Castling (king- and queen-side)
-✔ Structured using OOP best practices
+- ✔ Chess board display in console
+- ✔ Turn-based gameplay
+- ✔ Legal move validation for all pieces
+- ✔ Capture logic
+- ✔ Check and checkmate detection
+- ✔ En passant capture
+- ✔ Pawn promotion
+- ✔ Castling (king- and queen-side)
+- ✔ Structured using OOP best practices
 
 This project models most standard chess rules and enforces legal play throughout.
 
