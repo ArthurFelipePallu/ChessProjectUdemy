@@ -77,6 +77,29 @@ dotnet run --project "Chess Console Project.csproj"
 
 This is a two-player game at the terminal/console.
 
+## ♟️ Chessboard Overview
+
+The chessboard is displayed using ASCII characters with a clear coordinate system:
+
+- **Columns (files)** are labeled from **A to H** (shown at the bottom)
+- **Rows (ranks)** are labeled from **1 to 8** (shown on the left)
+- Each square alternates color to represent a standard chessboard
+- Pieces are represented by symbols/icons in their starting positions
+
+### Example board layout:
+8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+7 ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
+6  .  .  .  .  .  .  .  .
+5  .  .  .  .  .  .  .  .
+4  .  .  .  .  .  .  .  .
+3  .  .  .  .  .  .  .  .
+2 ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
+1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+  A  B  C  D  E  F  G  H
+  
+- Top side (rank 8) belongs to Black
+- Bottom side (rank 1) belongs to White
+
 ### 🎯 Move Format
 
 Enter moves using algebraic board coordinates:
@@ -84,6 +107,34 @@ Enter moves using algebraic board coordinates:
 <from> <to>
   e2    e4
 → Moves the Pawn from e2 to e4.
+
+## 🔍 Piece Selection & Move Highlighting
+
+When a player selects a piece, the game visually highlights all **valid moves**
+available for that piece directly on the board.
+
+### 🟥 Highlighted Squares
+- Highlighted squares indicate **legal destinations** for the selected piece
+- Only moves that follow **standard chess rules** are shown
+- This helps players quickly understand their available options
+
+### ♟️ How It Works
+1. The player selects a piece by entering its position (as part of a move)
+2. The board updates and displays highlighted squares
+3. The player chooses one of the highlighted destinations to complete the move
+
+## ❗ Invalid Destination Handling
+- If the destination square is **not highlighted**, the move is rejected
+- The player is notified that the move is invalid
+- The game then waits for a new input
+
+## ♟️ Captured Pieces Display
+The game keeps track of all captured pieces and displays them on the screen
+for easy reference during gameplay.
+
+- Captured pieces are shown grouped by player
+- The display updates immediately after a capture
+- This allows players to quickly see the material advantage at any point
 
 ----------------------------------------------------------------------------
 
@@ -93,6 +144,7 @@ Enter moves using algebraic board coordinates:
 - ✔ Turn-based gameplay
 - ✔ Legal move validation for all pieces
 - ✔ Capture logic
+- ✔ Show Captured Pieces
 - ✔ Check and checkmate detection
 - ✔ En passant capture
 - ✔ Pawn promotion
