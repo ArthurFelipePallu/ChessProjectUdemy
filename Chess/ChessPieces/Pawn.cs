@@ -24,7 +24,7 @@ public class Pawn : Piece
         
         for (var i = 1; i <= firstPawnMove; i++)
         {
-            var pos = new Position(PiecePosition.Row + ((int)vDir * i), PiecePosition.Column);
+            var pos = PiecePosition.Offset((int)vDir * i, 0);
             if (PossibleMoveAtPositionIsOfAllowedTypes(pos,MovementType.Move))
                 SetPositionAsPossibleMove(pos);
         }
@@ -40,7 +40,8 @@ public class Pawn : Piece
         //is in 5th rank
         if(!PawnIsIn5ThRank()) return;
         //has opponent pawn by its side
-        var enemyPawn  = Board.AccessPieceAtCoordinates(PiecePosition.Row, PiecePosition.Column + (int)hDir);
+        var sidePosition = PiecePosition.Offset(0, (int)hDir);
+        var enemyPawn  = Board.AccessPieceAtChessNotationPosition(sidePosition);
         if (enemyPawn == null) return;
 
         //opponents pawn moved only once
@@ -49,7 +50,7 @@ public class Pawn : Piece
         if (Board.LastMovedPiece != enemyPawn) return;
 
         var vDir = GetPawnDirectionInBoardByColor();
-        SetPositionAsPossibleMove(new Position(PiecePosition.Row + (int)vDir, PiecePosition.Column + (int)hDir));
+        SetPositionAsPossibleMove(PiecePosition.Offset((int)vDir, (int)hDir));
     }
 
     private bool PawnIsIn5ThRank()
@@ -57,9 +58,9 @@ public class Pawn : Piece
         var isPawnWhite = PieceColor == PieceColor.White;
         if (isPawnWhite)
         {
-            return PiecePosition.Row == 3;
+            return PiecePosition.RowIndex == 3;
         }
-        return PiecePosition.Row == 4;
+        return PiecePosition.RowIndex == 4;
     }
     
     
@@ -84,7 +85,7 @@ public class Pawn : Piece
     {
         try
         {
-            var pos = new Position(PiecePosition.Row + rowModifier, PiecePosition.Column + columnModifier);
+            var pos = PiecePosition.Offset(rowModifier, columnModifier);
             if (PossibleMoveAtPositionIsOfAllowedTypes(pos, movementType))
             {
                 SetPositionAsPossibleMove(pos);
@@ -106,6 +107,6 @@ public class Pawn : Piece
     {
         var rowToPromote = GetPieceColor() == PieceColor.White ? 0 : 7;
         
-        return PiecePosition.Row == rowToPromote;
+        return PiecePosition.RowIndex == rowToPromote;
     }
 }

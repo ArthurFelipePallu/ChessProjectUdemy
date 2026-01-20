@@ -22,7 +22,7 @@ public abstract class Piece
     protected char ChessNotation;
     protected PieceType PieceType;
     protected readonly PieceColor PieceColor;
-    protected Position PiecePosition;
+    protected ChessNotationPosition PiecePosition;
     protected readonly ChessBoard Board;
     
     /// <summary>
@@ -54,13 +54,13 @@ public abstract class Piece
     /// </summary>
     public bool IsCurrentlyAtCoordinates(int row, int col)
     {
-        return PiecePosition.Row == row && PiecePosition.Column == col;
+        return PiecePosition.RowIndex == row && PiecePosition.ColumnIndex == col;
     }
-    public void SetPiecePosition(Position position)
+    public void SetPiecePosition(ChessNotationPosition position)
     {
         PiecePosition = position;
     }
-    public Position GetPiecePosition()
+    public ChessNotationPosition GetPiecePosition()
     {
         return PiecePosition;
     }
@@ -110,12 +110,7 @@ public abstract class Piece
     
     public bool ChessNotationPositionIsInPossibleMoves(ChessNotationPosition chessNotationPos)
     {
-        var pos = chessNotationPos.ToPosition();
-        return CoordinatesIsInPossibleMoves(pos.Row, pos.Column);
-    }
-    public bool PositionIsInPossibleMoves(Position pos)
-    {
-        return CoordinatesIsInPossibleMoves(pos.Row, pos.Column);
+        return CoordinatesIsInPossibleMoves(chessNotationPos.RowIndex, chessNotationPos.ColumnIndex);
     }
     private bool CoordinatesIsInPossibleMoves(int row,int col)
     {
@@ -131,46 +126,43 @@ public abstract class Piece
         var countHelper = 0;
         var keepGoing = true;
 
-        var possibleMovePosX = 0;
-        var possibleMovePosY = 0;
-
-        var possiblePosition = new Position(possibleMovePosX, possibleMovePosY);
         while (keepGoing)
         {
             countHelper++;
-            possibleMovePosX = PiecePosition.Row + (countHelper * (int)hDir);
-            possibleMovePosY = PiecePosition.Column + (countHelper * (int)vDir);
             try
             {
-                possiblePosition.SetPosition(possibleMovePosX, possibleMovePosY);
+                var possiblePosition = PiecePosition.Offset(
+                    countHelper * (int)vDir, 
+                    countHelper * (int)hDir);
+
+                var move = CheckMovementTypeAt(possiblePosition);
+                
+                switch (move)
+                {
+                    case MovementType.Move :
+                        SetPositionAsPossibleMove(possiblePosition);
+                        break;
+                    case MovementType.TakeEnemyPiece:
+                        SetPositionAsPossibleMove(possiblePosition);
+                        keepGoing = false;
+                        break;
+                    case MovementType.Illegal:
+                        keepGoing = false;
+                        break;
+                    case MovementType.AllyPiece :
+                        keepGoing = false;
+                        break;
+                    case MovementType.SamePiece :
+                        keepGoing = false;
+                        break;
+                }
             }
             catch (MovementException e)
             {
                 keepGoing = false;
                 break;
             }
-
-            var move = CheckMovementTypeAt(possiblePosition);
             
-            switch (move)
-            {
-                case MovementType.Move :
-                    SetPositionAsPossibleMove(possiblePosition);
-                    break;
-                case MovementType.TakeEnemyPiece:
-                    SetPositionAsPossibleMove(possiblePosition);
-                    keepGoing = false;
-                    break;
-                case MovementType.Illegal:
-                    keepGoing = false;
-                    break;
-                case MovementType.AllyPiece :
-                    keepGoing = false;
-                    break;
-                case MovementType.SamePiece :
-                    keepGoing = false;
-                    break;
-            }
             if(countHelper >= maxDistantMovesToCheck)
                 keepGoing = false;
         }
@@ -179,7 +171,7 @@ public abstract class Piece
     {
         try
         {
-            var pos = new Position(PiecePosition.Row + rowModifier, PiecePosition.Column + columnModifier);
+            var pos = PiecePosition.Offset(rowModifier, columnModifier);
             return IsPieceAtPositionIsAnEnemyOfType(pos, piecesToBeAwareOf);
         }
         catch (MovementException e)
@@ -191,7 +183,7 @@ public abstract class Piece
     {
         try
         {
-            var pos = new Position(PiecePosition.Row + rowModifier, PiecePosition.Column + columnModifier);
+            var pos = PiecePosition.Offset(rowModifier, columnModifier);
             if (!PossibleMoveAtPositionIsOfAllowedTypes(pos, MovementType.Move, MovementType.TakeEnemyPiece))
                 return false;
             SetPositionAsPossibleMove(pos);
@@ -203,7 +195,7 @@ public abstract class Piece
         }
        
     }
-    protected bool PossibleMoveAtPositionIsOfAllowedTypes(Position pos,params MovementType[] allowedMovementTypes)
+    protected bool PossibleMoveAtPositionIsOfAllowedTypes(ChessNotationPosition pos,params MovementType[] allowedMovementTypes)
     {
         var move = CheckMovementTypeAt(pos);
         return  allowedMovementTypes.Contains(move);
@@ -213,44 +205,40 @@ public abstract class Piece
         var countHelper = 0;
         var keepGoing = true;
 
-        var possibleMovePosX = 0;
-        var possibleMovePosY = 0;
-
-        var possiblePosition = new Position(possibleMovePosX, possibleMovePosY);
         while (keepGoing)
         {
             countHelper++;
-            possibleMovePosX = PiecePosition.Row + (countHelper * (int)vDirection);
-            possibleMovePosY = PiecePosition.Column + (countHelper * (int)hDirection);
             try
             {
-                possiblePosition.SetPosition(possibleMovePosX, possibleMovePosY);
+                var possiblePosition = PiecePosition.Offset(
+                    countHelper * (int)vDirection, 
+                    countHelper * (int)hDirection);
+                
+                var move = CheckMovementTypeAt(possiblePosition);
+                switch (move)
+                {
+                    case MovementType.Move:
+                        break;
+                    case MovementType.Illegal:
+                        keepGoing = false;
+                        break;
+                    case MovementType.AllyPiece:
+                        keepGoing = false;
+                        break;
+                    case MovementType.SamePiece:
+                        keepGoing = false;
+                        break;
+                    case MovementType.TakeEnemyPiece:
+                        var piece = Board.AccessPieceAtChessNotationPosition(possiblePosition);
+                        return piecesToBeAwareOf.Contains(piece.PieceType);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Was Checking for EnemyPiece { piecesToBeAwareOf[0].ToString()}");
                 return false;
-            }
-            var move = CheckMovementTypeAt(possiblePosition);
-            switch (move)
-            {
-                case MovementType.Move:
-                    break;
-                case MovementType.Illegal:
-                    keepGoing = false;
-                    break;
-                case MovementType.AllyPiece:
-                    keepGoing = false;
-                    break;
-                case MovementType.SamePiece:
-                    keepGoing = false;
-                    break;
-                case MovementType.TakeEnemyPiece:
-                    var piece = Board.AccessPieceAtPosition(possiblePosition);
-                    return piecesToBeAwareOf.Contains(piece.PieceType);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
             
             if(countHelper >= maxDistantMovesToCheck)
@@ -264,30 +252,26 @@ public abstract class Piece
     {
         var countHelper = 0;
         var keepGoing = true;
-
-        var possibleMovePosX = 0;
-        var possibleMovePosY = 0;
         var maxDistantMovesToCheck = 8;
 
-        var possiblePosition = new Position(possibleMovePosX, possibleMovePosY);
         while (keepGoing)
         {
             countHelper++;
-            possibleMovePosX = PiecePosition.Row + (countHelper * (int)vDirection);
-            possibleMovePosY = PiecePosition.Column + (countHelper * (int)hDirection);
             try
             {
-                possiblePosition.SetPosition(possibleMovePosX, possibleMovePosY);
+                var possiblePosition = PiecePosition.Offset(
+                    countHelper * (int)vDirection, 
+                    countHelper * (int)hDirection);
+
+                var piece = Board.AccessPieceAtChessNotationPosition(possiblePosition);
+                if (piece != null)
+                    return piece;
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Was Checking for Piece but went out of bounds");
                 return null;
             }
-
-            var piece = Board.AccessPieceAtPosition(possiblePosition);
-            if (piece != null)
-                return piece;
             
             if(countHelper >= maxDistantMovesToCheck)
                 keepGoing = false;
@@ -297,31 +281,31 @@ public abstract class Piece
     }
     
     
-    protected bool PossibleMoveAtPositionIsLegalAndNotOfNotSpecifiedTypes(Position pos,params MovementType[] notAllowedMovementTypes)
+    protected bool PossibleMoveAtPositionIsLegalAndNotOfNotSpecifiedTypes(ChessNotationPosition pos,params MovementType[] notAllowedMovementTypes)
     {
         var move = CheckMovementTypeAt(pos);
         return move != MovementType.Illegal && !notAllowedMovementTypes.Contains(move);
     }
 
-    private bool IsPieceAtPositionIsAnEnemyOfType(Position position,params PieceType[] enemyPiecesToBeAware)
+    private bool IsPieceAtPositionIsAnEnemyOfType(ChessNotationPosition position,params PieceType[] enemyPiecesToBeAware)
     {
         if (PossibleMoveAtPositionIsLegalAndNotOfNotSpecifiedTypes(position,MovementType.TakeEnemyPiece)) return false;
-        var piece = Board.AccessPieceAtPosition(position);
+        var piece = Board.AccessPieceAtChessNotationPosition(position);
         return enemyPiecesToBeAware.Contains(piece.PieceType);
 
     }
-    private MovementType CheckMovementTypeAt(Position position)
+    private MovementType CheckMovementTypeAt(ChessNotationPosition position)
     {
         try
         {
-            Board.ValidateBoardPosition(position);
+            Board.ValidateBoardChessNotationPosition(position);
         }
         catch (BoardException e)
         {
             return MovementType.Illegal;
         }
 
-        var pieceAtPosition = Board.AccessPieceAtPosition(position);
+        var pieceAtPosition = Board.AccessPieceAtChessNotationPosition(position);
         
         if (pieceAtPosition == null)
             return MovementType.Move;
@@ -329,13 +313,13 @@ public abstract class Piece
         if (pieceAtPosition.GetPieceColor() != PieceColor) return MovementType.TakeEnemyPiece;
         return pieceAtPosition.PieceType == PieceType ? MovementType.SamePiece : MovementType.AllyPiece;
     }
-    protected void SetPositionAsPossibleMove(Position pos)
+    protected void SetPositionAsPossibleMove(ChessNotationPosition pos)
     {
-        _possibleMoves[pos.Row,pos.Column] = true;
+        _possibleMoves[pos.RowIndex, pos.ColumnIndex] = true;
     }
-    protected void SetPositionAsNotPossibleMove(Position pos)
+    protected void SetPositionAsNotPossibleMove(ChessNotationPosition pos)
     {
-        _possibleMoves[pos.Row,pos.Column] = false;
+        _possibleMoves[pos.RowIndex, pos.ColumnIndex] = false;
     }
     
     

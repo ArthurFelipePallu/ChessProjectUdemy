@@ -31,19 +31,18 @@ public class ChessBoard
     public void AddPlayingPiece(PieceColor pieceColor , PieceType pieceType,char column,int row)
     {
         var notationPosition = new ChessNotationPosition(row, column);
-        var pos = notationPosition.ToPosition();
-        ValidateNewPiecePositionNotTaken(notationPosition.ToPosition());
-        var piece = CreatePieceOfTypeAndColorAtPosition(pieceType,pieceColor,pos);
+        ValidateNewPieceChessNotationPositionNotTaken(notationPosition);
+        var piece = CreatePieceOfTypeAndColorAtPosition(pieceType,pieceColor,notationPosition);
         _chessPieces.Add(piece);
-        Board[pos.Row, pos.Column] = piece;
+        Board[notationPosition.RowIndex, notationPosition.ColumnIndex] = piece;
     }
-    private Piece CreatePieceOfTypeAndColorAtPosition(PieceType pieceType,PieceColor color, Position position) 
+    private Piece CreatePieceOfTypeAndColorAtPosition(PieceType pieceType,PieceColor color, ChessNotationPosition position) 
     {
         var piece = CreateNewPieceOfTypeAndColorAtPosition(pieceType,color,position);
         piece.SetPiecePosition(position);
         return piece;
     }
-    private Piece CreateNewPieceOfTypeAndColorAtPosition(PieceType pieceType,PieceColor pieceColor,Position position)
+    private Piece CreateNewPieceOfTypeAndColorAtPosition(PieceType pieceType,PieceColor pieceColor,ChessNotationPosition position)
     {
         switch (pieceType)
         {
@@ -80,9 +79,9 @@ public class ChessBoard
     /// <summary>
     /// REMOVE PIECE METHODS
     /// </summary>
-    public Piece RemovePieceFromBoardAt(Position pos)
+    public Piece RemovePieceFromBoardAt(ChessNotationPosition pos)
     {
-        return RemovePieceFromBoardAtCoordinates(pos.Row, pos.Column);
+        return RemovePieceFromBoardAtCoordinates(pos.RowIndex, pos.ColumnIndex);
     }
     public Piece RemovePieceFromBoardAtCoordinates(int row,int col)
     {
@@ -97,16 +96,17 @@ public class ChessBoard
     }
     public void RemovePieceFromPlay(Piece piece)
     {
-        Board[piece.GetPiecePosition().Row,piece.GetPiecePosition().Column] = null;
+        var pos = piece.GetPiecePosition();
+        Board[pos.RowIndex, pos.ColumnIndex] = null;
         _capturedPieces.Add(piece);
     }
     
     /// <summary>
     /// PUT PIECES METHOD
     /// </summary>
-    public void PutPieceAtDestinationPosition(Piece piece , Position destination)
+    public void PutPieceAtDestinationPosition(Piece piece , ChessNotationPosition destination)
     {
-        PutPieceAtDestinationCoordinates(piece,destination.Row,destination.Column);
+        PutPieceAtDestinationCoordinates(piece,destination.RowIndex,destination.ColumnIndex);
         piece.SetPiecePosition(destination);
     }
     private void PutPieceAtDestinationCoordinates(Piece piece , int row , int col)
@@ -115,7 +115,8 @@ public class ChessBoard
     }
     public void ReturnPieceToPlay(Piece piece)
     {
-        Board[piece.GetPiecePosition().Row,piece.GetPiecePosition().Column] = piece;
+        var pos = piece.GetPiecePosition();
+        Board[pos.RowIndex, pos.ColumnIndex] = piece;
         _capturedPieces.Remove(piece);
     }
     
@@ -128,9 +129,9 @@ public class ChessBoard
         UpdateAllTargetedSquaresInBoardWithAdversaryTargets(color);
         return IsSquareInPositionTargetedByOpponent(king.GetPiecePosition());
     }
-    public bool IsSquareInPositionTargetedByOpponent(Position position)
+    public bool IsSquareInPositionTargetedByOpponent(ChessNotationPosition position)
     {
-        return IsSquareInCoordinatesTargetedByOpponent(position.Row, position.Column);
+        return IsSquareInCoordinatesTargetedByOpponent(position.RowIndex, position.ColumnIndex);
     }
     public bool IsSquareInCoordinatesTargetedByOpponent(int row, int column)
     {
@@ -146,11 +147,7 @@ public class ChessBoard
     }
     public bool HasPieceAtChessNotationPosition(ChessNotationPosition notationPosition)
     {
-        return HasPieceAtPosition(notationPosition.ToPosition());
-    }
-    public bool HasPieceAtPosition(Position position)
-    {
-        return HasPieceAtCoordinate(position.Row, position.Column);
+        return HasPieceAtCoordinate(notationPosition.RowIndex, notationPosition.ColumnIndex);
     }
     public bool HasPieceAtCoordinate(int row, int col)
     {
@@ -206,11 +203,7 @@ public class ChessBoard
     }
     public Piece AccessPieceAtChessNotationPosition(ChessNotationPosition notationPosition)
     {
-        return AccessPieceAtPosition(notationPosition.ToPosition());
-    }
-    public Piece AccessPieceAtPosition(Position position)
-    {
-        return AccessPieceAtCoordinates(position.Row, position.Column);
+        return AccessPieceAtCoordinates(notationPosition.RowIndex, notationPosition.ColumnIndex);
     }
     public Piece AccessPieceAtCoordinates(int row, int col)
     {
@@ -237,23 +230,16 @@ public class ChessBoard
     /// <summary>
     /// VALIDATION METHODS
     /// </summary>
-    public void ValidateNewPiecePositionNotTaken(Position pos)
+    public void ValidateNewPieceChessNotationPositionNotTaken(ChessNotationPosition pos)
     {
-        if (HasPieceAtPosition(pos))
+        if (HasPieceAtChessNotationPosition(pos))
         {
-            throw new BoardException($"[CHESS BOARD] Tried to Put a New Piece at {pos.ToString()} but there already is a piece {AccessPieceAtPosition(pos).GetPieceTypeAsString()} at this position");
+            throw new BoardException($"[CHESS BOARD] Tried to Put a New Piece at {pos.ToString()} but there already is a piece {AccessPieceAtChessNotationPosition(pos).GetPieceTypeAsString()} at this position");
         }
     }
-    public void ValidateNewPiecePositionNotTaken(int row, int column)
+    public void ValidateBoardChessNotationPosition(ChessNotationPosition position)
     {
-        if (HasPieceAtCoordinate(row, column))
-        {
-            throw new BoardException($"[CHESS BOARD] There already is a piece{AccessPieceAtCoordinates(row,column).GetPieceTypeAsString()} at this position");
-        }
-    }
-    public void ValidateBoardPosition(Position position)
-    {
-        ValidateBoardCoordinates(position.Row, position.Column);
+        ValidateBoardCoordinates(position.RowIndex, position.ColumnIndex);
     }
     private void ValidateBoardCoordinates(int row, int column)
     {

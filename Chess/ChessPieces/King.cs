@@ -58,35 +58,35 @@ public class King : Piece
 
         //Posição de Cima
         if (PossibleMovementAtPositionIsMoveOrTake((int)VerticalDirections.Up,(int)HorizontalDirections.None))
-            SetPositionAsPossibleMove(new Position(PiecePosition.Row + (int)VerticalDirections.Up, PiecePosition.Column + (int)HorizontalDirections.None));
+            SetPositionAsPossibleMove(PiecePosition.Offset((int)VerticalDirections.Up, (int)HorizontalDirections.None));
 
         //Posição de Cima e Esquerda
         if (PossibleMovementAtPositionIsMoveOrTake((int)VerticalDirections.Up,(int)HorizontalDirections.Left))
-            SetPositionAsPossibleMove(new Position(PiecePosition.Row + (int)VerticalDirections.Up, PiecePosition.Column + (int)HorizontalDirections.Left));
+            SetPositionAsPossibleMove(PiecePosition.Offset((int)VerticalDirections.Up, (int)HorizontalDirections.Left));
         
         //Posição de Cima e Direita
         if (PossibleMovementAtPositionIsMoveOrTake((int)VerticalDirections.Up,(int)HorizontalDirections.Right))
-            SetPositionAsPossibleMove(new Position(PiecePosition.Row + (int)VerticalDirections.Up, PiecePosition.Column + (int)HorizontalDirections.Right));
+            SetPositionAsPossibleMove(PiecePosition.Offset((int)VerticalDirections.Up, (int)HorizontalDirections.Right));
         
         //Posição Esquerda
         if (PossibleMovementAtPositionIsMoveOrTake((int)VerticalDirections.None,(int)HorizontalDirections.Left))
-            SetPositionAsPossibleMove(new Position(PiecePosition.Row + (int)VerticalDirections.None, PiecePosition.Column + (int)HorizontalDirections.Left));
+            SetPositionAsPossibleMove(PiecePosition.Offset((int)VerticalDirections.None, (int)HorizontalDirections.Left));
         
         //Posição Direita
         if (PossibleMovementAtPositionIsMoveOrTake((int)VerticalDirections.None,(int)HorizontalDirections.Right))
-            SetPositionAsPossibleMove(new Position(PiecePosition.Row + (int)VerticalDirections.None, PiecePosition.Column + (int)HorizontalDirections.Right));
+            SetPositionAsPossibleMove(PiecePosition.Offset((int)VerticalDirections.None, (int)HorizontalDirections.Right));
         
         //Posição de Baixo
         if (PossibleMovementAtPositionIsMoveOrTake((int)VerticalDirections.Down,(int)HorizontalDirections.None))
-            SetPositionAsPossibleMove(new Position(PiecePosition.Row + (int)VerticalDirections.Down, PiecePosition.Column + (int)HorizontalDirections.None));
+            SetPositionAsPossibleMove(PiecePosition.Offset((int)VerticalDirections.Down, (int)HorizontalDirections.None));
         
         //Posição de Baixo e Esquerda
         if (PossibleMovementAtPositionIsMoveOrTake((int)VerticalDirections.Down,(int)HorizontalDirections.Left))
-            SetPositionAsPossibleMove(new Position(PiecePosition.Row + (int)VerticalDirections.Down, PiecePosition.Column + (int)HorizontalDirections.Left));
+            SetPositionAsPossibleMove(PiecePosition.Offset((int)VerticalDirections.Down, (int)HorizontalDirections.Left));
         
         //Posição de Baixo e Direita
         if (PossibleMovementAtPositionIsMoveOrTake((int)VerticalDirections.Down,(int)HorizontalDirections.Right))
-            SetPositionAsPossibleMove(new Position(PiecePosition.Row + (int)VerticalDirections.Down, PiecePosition.Column + (int)HorizontalDirections.Right));
+            SetPositionAsPossibleMove(PiecePosition.Offset((int)VerticalDirections.Down, (int)HorizontalDirections.Right));
     }
 
     private void CheckPossibleMoveIsNotCheck(VerticalDirections vDir, HorizontalDirections hDir)
@@ -95,9 +95,9 @@ public class King : Piece
         //var kingOriginalPos = PiecePosition;
 
 
-        var auxPosition = new Position(PiecePosition.Row + (int)vDir, PiecePosition.Column + (int)hDir);
+        var auxPosition = PiecePosition.Offset((int)vDir, (int)hDir);
 
-        if(Board.IsSquareInCoordinatesTargetedByOpponent(auxPosition.Row , auxPosition.Column ))
+        if(Board.IsSquareInCoordinatesTargetedByOpponent(auxPosition.RowIndex , auxPosition.ColumnIndex ))
         {
             SetPositionAsNotPossibleMove(auxPosition);
         }
@@ -132,15 +132,15 @@ public class King : Piece
     {
         if (TimesMoved > 0) return false;
 
-        if (Board.IsSquareInCoordinatesTargetedByOpponent(PiecePosition.Row, PiecePosition.Column)) return false;
+        if (Board.IsSquareInCoordinatesTargetedByOpponent(PiecePosition.RowIndex, PiecePosition.ColumnIndex)) return false;
 
         var piece = GetFirstPieceInDirection(hDir, VerticalDirections.None);
         if (piece == null) return false;
         if (piece.GetPieceType() != PieceType.Rook) return false;
         if (piece.GetPieceColor() != PieceColor) return false;
         if(piece.TimesMoved > 0) return false;
-        if (Board.IsSquareInCoordinatesTargetedByOpponent(PiecePosition.Row, PiecePosition.Column + (int)hDir)) return false;
-        if (Board.IsSquareInCoordinatesTargetedByOpponent(PiecePosition.Row, PiecePosition.Column + (int)hDir * 2 )) return false;
+        if (Board.IsSquareInCoordinatesTargetedByOpponent(PiecePosition.RowIndex, PiecePosition.ColumnIndex + (int)hDir)) return false;
+        if (Board.IsSquareInCoordinatesTargetedByOpponent(PiecePosition.RowIndex, PiecePosition.ColumnIndex + (int)hDir * 2 )) return false;
 
 
         return true;
@@ -160,7 +160,7 @@ public class King : Piece
     
     private void SetCastlePositionAsPossible(HorizontalDirections hDir)
     {
-        SetPositionAsPossibleMove(new Position(PiecePosition.Row , PiecePosition.Column + (int)hDir * 2  ));
+        SetPositionAsPossibleMove(PiecePosition.Offset(0, (int)hDir * 2));
     }
     
     public override void AfterMoveVerification()

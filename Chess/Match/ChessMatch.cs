@@ -88,7 +88,7 @@ public class ChessMatch
                         _screen.ScreenWriteAndWaitForEnterToContinue($"The {piece} can not move to the {destinationChessNotationPosition} square");
                         break;
                     }
-                    ExecuteMovement(piece, destinationChessNotationPosition.ToPosition());
+                    ExecuteMovement(piece, destinationChessNotationPosition);
                 }
                 catch (Exception e)
                 {
@@ -118,8 +118,8 @@ public class ChessMatch
     {
         //Not gonna wait 
         Console.WriteLine("Entering Players Magnum and Hikaru");
-        EnterPlayer(new ChessPlayer("Magnus",2839,PieceColor.White));
-        EnterPlayer(new ChessPlayer("Hikaru",2813,PieceColor.Black));
+        EnterPlayer(new ChessPlayer("Elysia",2839,PieceColor.White));
+        EnterPlayer(new ChessPlayer("Valeron",2813,PieceColor.Black));
         if(CanStartGame())
             _matchStatus = MatchStatus.Starting;
     }
@@ -161,7 +161,7 @@ public class ChessMatch
     {
         _movesCount++;
     }
-    private void ExecuteMovement(Piece piece, Position destination)
+    private void ExecuteMovement(Piece piece, ChessNotationPosition destination)
     {
         var actionMessage = "";
         var movementIsSuccessful = false;
@@ -174,8 +174,8 @@ public class ChessMatch
         }
         else if (IsMovementEnPassent(piece, destination))
         {
-            var positionToTake = new Position(piece.GetPiecePosition().Row, destination.Column);
-            var pieceToTake = _chessBoard.AccessPieceAtPosition(positionToTake);
+            var positionToTake = new ChessNotationPosition(piece.GetPiecePosition().Row, destination.Col);
+            var pieceToTake = _chessBoard.AccessPieceAtChessNotationPosition(positionToTake);
             _chessBoard.RemovePieceFromPlay(pieceToTake);
             
             movementIsSuccessful = MovePieceTo(piece,destination,out actionMessage);
@@ -192,8 +192,8 @@ public class ChessMatch
             if (pawn.CanPromote())
             {
                 var pawnPromotesTo = _screen.AskForPawnPromotion();
-                var pawnChessNotationPos = pawn.GetPiecePosition().ToChessNotationPosition();
-                _chessBoard.RemovePieceFromBoardAt(pawn.GetPiecePosition());
+                var pawnChessNotationPos = pawn.GetPiecePosition();
+                _chessBoard.RemovePieceFromBoardAt(pawnChessNotationPos);
                 _chessBoard.AddPlayingPiece(pawn.GetPieceColor(),pawnPromotesTo,pawnChessNotationPos.Col,pawnChessNotationPos.Row);
                 
                 _screen.PrintBoardAndPlayers(_playerWhite,_playerBlack,_chessBoard,_toPlay);
@@ -208,12 +208,12 @@ public class ChessMatch
             
         }
     }
-    private bool MovePieceTo(Piece piece, Position destination, out string message)
+    private bool MovePieceTo(Piece piece, ChessNotationPosition destination, out string message)
     {
         var originalPiecePosition = piece.GetPiecePosition();
         _chessBoard.RemovePieceFromBoardAt(originalPiecePosition);
         
-        var destinationPiece = _chessBoard.AccessPieceAtPosition(destination);
+        var destinationPiece = _chessBoard.AccessPieceAtChessNotationPosition(destination);
         if(destinationPiece != null)
         {
             _lastCapturedPiece = destinationPiece;
@@ -228,14 +228,19 @@ public class ChessMatch
             _chessBoard.PutPieceAtDestinationPosition(piece,originalPiecePosition);
             if(destinationPiece != null)
                 _chessBoard.PutPieceAtDestinationPosition(destinationPiece,destination);
-            message = $"[ CHESS MATCH ] Movement is Invalid. The movement {originalPiecePosition.ToChessNotationPosition()} to {destination.ToChessNotationPosition()} left the {piece.GetPieceColor().ToString()} King In Check.";
-            return false;
+
+            throw new ChessException(
+                message: $"Movement is Invalid. The movement left the {piece.GetPieceColor()} King In Check.",
+                ChessErrorCode.CheckViolation,
+                fromSquare: originalPiecePosition.ToString(),
+                toSquare: destination.ToString(),
+                piece: piece.ToString());
         }    
         piece.IncreaseTimesMoved();
         
         message = destinationPiece == null
-            ? $"[ CHESS MATCH ] Piece {piece} moved to destination {destination.ToChessNotationPosition()}"
-            : $"[ CHESS MATCH ] Piece [{piece}] took [{destinationPiece}] at destination [{destination.ToChessNotationPosition()}]";
+            ? $"[ CHESS MATCH ] Piece {piece} moved to destination {destination}"
+            : $"[ CHESS MATCH ] Piece [{piece}] took [{destinationPiece}] at destination [{destination}]";
 
 
         return true;
@@ -244,33 +249,35 @@ public class ChessMatch
     /// <summary>
     /// EN PASSENT
     /// </summary>
-    private bool IsMovementEnPassent(Piece piece, Position destination)
+    private bool IsMovementEnPassent(Piece piece, ChessNotationPosition destination)
     {
         if (piece.GetPieceType() != PieceType.Pawn) return false;
-        if (piece.GetPiecePosition().Column == destination.Column) return false;
-        return _chessBoard.AccessPieceAtPosition(destination) == null;
+        if (piece.GetPiecePosition().Col == destination.Col) return false;
+        return _chessBoard.AccessPieceAtChessNotationPosition(destination) == null;
     }
 
     /// <summary>
     /// CASTLES
     /// </summary>
-    private bool IsMovementCastles(Piece piece, Position destination)
+    private bool IsMovementCastles(Piece piece, ChessNotationPosition destination)
     {
         if (piece.GetPieceType() != PieceType.King) return false;
-        var x = destination.Column - piece.GetPiecePosition().Column;
+        var x = destination.ColumnIndex - piece.GetPiecePosition().ColumnIndex;
         return Math.Abs(x) == 2;
     }
-    private HorizontalDirections GetCastleDirection(Piece king, Position destination)
+    private HorizontalDirections GetCastleDirection(Piece king, ChessNotationPosition destination)
     {
-        var x = destination.Column - king.GetPiecePosition().Column;
+        var x = destination.ColumnIndex - king.GetPiecePosition().ColumnIndex;
         return x < 0 ? HorizontalDirections.Left : HorizontalDirections.Right;
     }
     private void MoveRookInCastles(Piece king , HorizontalDirections castlesDir)
     {
         var rookCol = castlesDir == HorizontalDirections.Left ? 'a' : 'h';
-        var rookOriginalChessNotationPosition = new ChessNotationPosition(king.GetPiecePosition().ToChessNotationPosition().Row , rookCol);
+        var kingPos = king.GetPiecePosition();
+        var rookOriginalChessNotationPosition = new ChessNotationPosition(kingPos.Row, rookCol);
         var rook = _chessBoard.AccessPieceAtChessNotationPosition(rookOriginalChessNotationPosition);
-        var rookDestinationPosition = new Position(king.GetPiecePosition().Row, king.GetPiecePosition().Column - (int)castlesDir );
+        var rookDestinationColumnIndex = kingPos.ColumnIndex - (int)castlesDir;
+        var rookDestinationPosition = ChessNotationPosition.FromArrayIndices(kingPos.RowIndex, rookDestinationColumnIndex);
         MovePieceTo(rook,rookDestinationPosition,out var actionMessage);
 
         _screen.ScreenWriteAndWaitForEnterToContinue(actionMessage);
@@ -305,7 +312,9 @@ public class ChessMatch
     private void TryAddBlackPlayer(ChessPlayer player)
     {
         if (_playerBlack != null)
-            ColorAlreadyTakenException(player);
+            throw new ChessException(
+                message: $"[CHESS MATCH] Another player already is playing as {player.PlayingAs()}",
+                ChessErrorCode.IllegalState);
         _playerBlack = player;
     }
     private void ColorAlreadyTakenException(ChessPlayer player)
@@ -349,7 +358,7 @@ public class ChessMatch
                     if (mat[i, j])
                     {
                         _lastCapturedPiece = null;
-                        var destination = new Position(i, j);
+                        var destination = ChessNotationPosition.FromArrayIndices(i, j);
                         var moveIsPossible = MovePieceTo(piece, destination, out var msg);
                         
                         if (moveIsPossible)
